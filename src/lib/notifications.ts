@@ -1,10 +1,10 @@
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
 const snsClient = new SNSClient({
-  region: process.env.AWS_REGION || "ap-south-1",
+  region: process.env.REGION || "ap-south-1",
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+    accessKeyId: process.env.ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.SECRET_ACCESS_KEY || "",
   }
 });
 
@@ -18,7 +18,7 @@ export interface NotificationPayload {
 export async function sendInstantNotification(payload: NotificationPayload) {
   const { recipientPhone, message } = payload;
 
-  if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY && recipientPhone) {
+  if (process.env.ACCESS_KEY_ID && process.env.SECRET_ACCESS_KEY && recipientPhone) {
     try {
       const command = new PublishCommand({
         Message: `[SuperRent Alert] ${message}`,

@@ -1,10 +1,10 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const region = process.env.AWS_REGION || "ap-south-1";
-const accessKeyId = process.env.AWS_ACCESS_KEY_ID || "";
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || "";
-export const bucketName = process.env.AWS_S3_BUCKET_NAME || "";
+const region = process.env.REGION || "ap-south-1";
+const accessKeyId = process.env.ACCESS_KEY_ID || "";
+const secretAccessKey = process.env.SECRET_ACCESS_KEY || "";
+export const bucketName = process.env.S3_BUCKET_NAME || "";
 
 export const s3Client = new S3Client({
   region,
@@ -23,7 +23,7 @@ export async function uploadToS3(
   contentType: string
 ): Promise<string> {
   if (!bucketName) {
-    throw new Error("AWS_S3_BUCKET_NAME is not configured in environment variables.");
+    throw new Error("S3_BUCKET_NAME is not configured in environment variables.");
   }
 
   const command = new PutObjectCommand({
@@ -48,7 +48,7 @@ export async function getPresignedUploadUrl(
   expiresIn = 300
 ): Promise<{ uploadUrl: string; fileUrl: string }> {
   if (!bucketName) {
-    throw new Error("AWS_S3_BUCKET_NAME is not configured in environment variables.");
+    throw new Error("S3_BUCKET_NAME is not configured in environment variables.");
   }
 
   const command = new PutObjectCommand({
