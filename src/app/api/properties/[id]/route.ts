@@ -3,13 +3,16 @@ import connectDB from "@/lib/mongoose";
 import { Property } from "@/models/Property";
 import { User } from "@/models/User";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
 
     let property = null;
-    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+    if (id && id.match(/^[0-9a-fA-F]{24}$/)) {
       property = await Property.findById(id).populate("ownerId", "name phone email");
     }
 

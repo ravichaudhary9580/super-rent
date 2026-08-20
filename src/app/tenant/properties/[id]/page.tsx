@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { 
   MapPin, 
   IndianRupee, 
@@ -21,7 +22,9 @@ import {
   Loader2
 } from "lucide-react";
 
-export default function TenantPropertyDetails({ params }: { params: { id: string } }) {
+export default function TenantPropertyDetails() {
+  const routerParams = useParams();
+  const id = (routerParams?.id as string) || "";
   const [property, setProperty] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
@@ -30,9 +33,10 @@ export default function TenantPropertyDetails({ params }: { params: { id: string
 
   useEffect(() => {
     async function loadProperty() {
+      if (!id) return;
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/properties/${params.id}`);
+        const res = await fetch(`/api/properties/${id}`);
         if (res.ok) {
           const data = await res.json();
           setProperty(data.property);
@@ -44,7 +48,7 @@ export default function TenantPropertyDetails({ params }: { params: { id: string
       }
     }
     loadProperty();
-  }, [params.id]);
+  }, [id]);
 
   const handleShare = () => {
     if (typeof window !== "undefined") {

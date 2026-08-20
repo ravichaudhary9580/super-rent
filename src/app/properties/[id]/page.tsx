@@ -3,17 +3,21 @@
 import { useState, useEffect } from "react";
 import { MapPin, IndianRupee, ShieldCheck, CheckCircle2, PhoneCall, Loader2, Building, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
-export default function PropertyDetails({ params }: { params: { id: string } }) {
+export default function PropertyDetails() {
+  const routerParams = useParams();
+  const id = (routerParams?.id as string) || "";
   const [property, setProperty] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [contacted, setContacted] = useState(false);
 
   useEffect(() => {
     async function loadProperty() {
+      if (!id) return;
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/properties/${params.id}`);
+        const res = await fetch(`/api/properties/${id}`);
         if (res.ok) {
           const data = await res.json();
           setProperty(data.property);
@@ -25,7 +29,7 @@ export default function PropertyDetails({ params }: { params: { id: string } }) 
       }
     }
     loadProperty();
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return (
