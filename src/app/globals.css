@@ -30,7 +30,8 @@
   --dashboard-zoom: 0.9;
 }
 
-[data-theme="dark"], .dark {
+[data-theme="dark"],
+.dark {
   --color-bg-main: #090d16;
   --color-bg-surface: #0f172a;
   --color-text-main: #f8fafc;
@@ -43,6 +44,158 @@
 html {
   min-height: 100%;
 }
+
+/* =========================================================
+   Scroll-triggered Animation System
+   Elements with [data-animate] start invisible/offset.
+   When IntersectionObserver adds .in-view, they transition in.
+   ========================================================= */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+[data-animate="fade-up"] {
+  transform: translateY(32px);
+}
+[data-animate="fade-down"] {
+  transform: translateY(-28px);
+}
+[data-animate="fade-left"] {
+  transform: translateX(-40px);
+}
+[data-animate="fade-right"] {
+  transform: translateX(40px);
+}
+[data-animate="scale"] {
+  transform: scale(0.9) translateY(16px);
+}
+[data-animate="zoom-in"] {
+  transform: scale(0.84);
+}
+[data-animate="zoom-out"] {
+  transform: scale(1.12);
+}
+[data-animate="flip-up"] {
+  transform: perspective(1000px) rotateX(24deg) translateY(36px);
+  transform-origin: center bottom;
+}
+[data-animate="tilt-in"] {
+  transform: perspective(1200px) rotateY(-12deg) rotateX(10deg) translateY(28px) scale(0.94);
+  transform-origin: center center;
+}
+[data-animate="pop"] {
+  transform: scale(0.78) translateY(20px);
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+[data-animate="blur-in"] {
+  filter: blur(12px);
+  transform: translateY(20px);
+}
+[data-animate="fade"] {
+  transform: none;
+}
+
+[data-animate].in-view {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: blur(0px) !important;
+}
+
+/* Stagger delay helpers */
+[data-delay="50"]  { transition-delay: 50ms; }
+[data-delay="100"] { transition-delay: 100ms; }
+[data-delay="150"] { transition-delay: 150ms; }
+[data-delay="200"] { transition-delay: 200ms; }
+[data-delay="250"] { transition-delay: 250ms; }
+[data-delay="300"] { transition-delay: 300ms; }
+[data-delay="350"] { transition-delay: 350ms; }
+[data-delay="400"] { transition-delay: 400ms; }
+[data-delay="450"] { transition-delay: 450ms; }
+[data-delay="500"] { transition-delay: 500ms; }
+[data-delay="600"] { transition-delay: 600ms; }
+[data-delay="700"] { transition-delay: 700ms; }
+
+/* Continuous floating & glow animations */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(10px) rotate(-1deg); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.05); }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+.animate-float-reverse {
+  animation: float-reverse 7s ease-in-out infinite;
+}
+.animate-pulse-soft {
+  animation: pulse-soft 8s ease-in-out infinite;
+}
+
+/* =========================================================
+   Modern Background Grid & Texture Patterns
+   ========================================================= */
+.bg-grid-slate-pattern {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(99, 102, 241, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.07) 1px, transparent 1px);
+}
+
+.bg-grid-dense-pattern {
+  background-size: 20px 20px;
+  background-image: 
+    linear-gradient(to right, rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+}
+
+.bg-dot-slate-pattern {
+  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(79, 70, 229, 0.12) 1.25px, transparent 1.25px);
+}
+
+.bg-dot-fine-pattern {
+  background-size: 16px 16px;
+  background-image: radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+}
+
+.bg-radial-mask {
+  mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, #000 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, #000 30%, transparent 100%);
+}
+
+.bg-radial-mask-soft {
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, #000 40%, transparent 100%);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  [data-animate] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+  .animate-float-slow,
+  .animate-float-reverse,
+  .animate-pulse-soft {
+    animation: none !important;
+  }
+}
+
 
 body {
   zoom: var(--dashboard-zoom, 0.9);
@@ -68,9 +221,11 @@ body {
     zoom: 1 !important;
     min-height: 100vh !important;
   }
+
   .min-h-screen {
     min-height: 100vh !important;
   }
+
   .h-screen {
     height: 100vh !important;
   }
@@ -79,82 +234,97 @@ body {
 /* =========================================================
    Automated Dynamic Dark Theme Overrides
    ========================================================= */
-.dark body, [data-theme="dark"] body {
+.dark body,
+[data-theme="dark"] body {
   background-color: #090d16 !important;
   color: #f8fafc !important;
 }
 
 /* Background conversions */
-.dark .bg-white, [data-theme="dark"] .bg-white {
+.dark .bg-white,
+[data-theme="dark"] .bg-white {
   background-color: #0f172a !important;
   color: #f8fafc;
 }
 
-.dark .bg-slate-50, [data-theme="dark"] .bg-slate-50 {
+.dark .bg-slate-50,
+[data-theme="dark"] .bg-slate-50 {
   background-color: #090d16 !important;
 }
 
-.dark .bg-slate-100, [data-theme="dark"] .bg-slate-100 {
+.dark .bg-slate-100,
+[data-theme="dark"] .bg-slate-100 {
   background-color: #1e293b !important;
 }
 
-.dark .bg-slate-200, [data-theme="dark"] .bg-slate-200 {
+.dark .bg-slate-200,
+[data-theme="dark"] .bg-slate-200 {
   background-color: #334155 !important;
 }
 
-.dark .bg-blue-50, [data-theme="dark"] .bg-blue-50 {
+.dark .bg-blue-50,
+[data-theme="dark"] .bg-blue-50 {
   background-color: rgba(var(--color-primary-rgb, 37, 99, 235), 0.15) !important;
 }
 
-.dark .bg-emerald-50, [data-theme="dark"] .bg-emerald-50 {
+.dark .bg-emerald-50,
+[data-theme="dark"] .bg-emerald-50 {
   background-color: rgba(16, 185, 129, 0.15) !important;
 }
 
-.dark .bg-indigo-50, [data-theme="dark"] .bg-indigo-50 {
+.dark .bg-indigo-50,
+[data-theme="dark"] .bg-indigo-50 {
   background-color: rgba(var(--color-secondary-rgb, 99, 102, 241), 0.15) !important;
 }
 
-.dark .bg-orange-50, [data-theme="dark"] .bg-orange-50 {
+.dark .bg-orange-50,
+[data-theme="dark"] .bg-orange-50 {
   background-color: rgba(249, 115, 22, 0.15) !important;
 }
 
 /* Border conversions */
-.dark .border-slate-200, 
+.dark .border-slate-200,
 .dark .border-slate-100,
 [data-theme="dark"] .border-slate-200,
 [data-theme="dark"] .border-slate-100 {
   border-color: #1e293b !important;
 }
 
-.dark .border-blue-100, [data-theme="dark"] .border-blue-100 {
+.dark .border-blue-100,
+[data-theme="dark"] .border-blue-100 {
   border-color: rgba(var(--color-primary-rgb, 37, 99, 235), 0.3) !important;
 }
 
 /* Typography conversions */
-.dark .text-slate-900, [data-theme="dark"] .text-slate-900 {
+.dark .text-slate-900,
+[data-theme="dark"] .text-slate-900 {
   color: #f8fafc !important;
 }
 
-.dark .text-slate-800, [data-theme="dark"] .text-slate-800 {
+.dark .text-slate-800,
+[data-theme="dark"] .text-slate-800 {
   color: #e2e8f0 !important;
 }
 
-.dark .text-slate-700, [data-theme="dark"] .text-slate-700 {
+.dark .text-slate-700,
+[data-theme="dark"] .text-slate-700 {
   color: #cbd5e1 !important;
 }
 
-.dark .text-slate-600, 
+.dark .text-slate-600,
 .dark .text-slate-500,
 [data-theme="dark"] .text-slate-600,
 [data-theme="dark"] .text-slate-500 {
   color: #94a3b8 !important;
 }
 
-.dark .text-blue-900, [data-theme="dark"] .text-blue-900 {
+.dark .text-blue-900,
+[data-theme="dark"] .text-blue-900 {
   color: #93c5fd !important;
 }
 
-.dark .text-blue-700, [data-theme="dark"] .text-blue-700 {
+.dark .text-blue-700,
+[data-theme="dark"] .text-blue-700 {
   color: #bfdbfe !important;
 }
 
@@ -168,6 +338,18 @@ body {
   background-color: #1e293b;
   color: #f8fafc;
   border-color: #334155;
+}
+
+/* Root reset */
+:is(.dark, [data-theme="dark"]) [data-theme="light"],
+:is(.dark, [data-theme="dark"]) [data-theme="light"] *:not(.force-dark) {
+  color-scheme: light;
+}
+
+/* Preserve gradient text clipping — must NOT override color: transparent */
+:is(.dark, [data-theme="dark"]) [data-theme="light"] .text-transparent {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 /* =========================================================
