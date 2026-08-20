@@ -1,26 +1,343 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* prettier-ignore */
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-light: var(--color-primary-light);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+  --color-bg-main: var(--color-bg-main);
+  --color-bg-surface: var(--color-bg-surface);
+  --color-text-main: var(--color-text-main);
+  --color-text-muted: var(--color-text-muted);
+  --color-border-main: var(--color-border-main);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #eff6ff;
+  --color-secondary: #4f46e5;
+  --color-accent: #f59e0b;
+  --color-bg-main: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+  --color-border-main: #e2e8f0;
+  --dashboard-zoom: 0.9;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme="dark"], .dark {
+  --color-bg-main: #090d16;
+  --color-bg-surface: #0f172a;
+  --color-text-main: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-border-main: #1e293b;
+  color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Global Portal & App Scaling */
+html {
+  min-height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  zoom: var(--dashboard-zoom, 0.9);
+  min-height: calc(100vh / var(--dashboard-zoom, 0.9));
+  background-color: var(--color-bg-main);
+  color: var(--color-text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Adjust full viewport height classes to fill 100% of physical screen when scaled */
+.min-h-screen {
+  min-height: calc(100vh / var(--dashboard-zoom, 0.9)) !important;
+}
+
+.h-screen {
+  height: calc(100vh / var(--dashboard-zoom, 0.9)) !important;
+}
+
+/* Mobile Screens (Touch & Normal 100% Viewport Scaling) */
+@media (max-width: 768px) {
+  body {
+    zoom: 1 !important;
+    min-height: 100vh !important;
+  }
+  .min-h-screen {
+    min-height: 100vh !important;
+  }
+  .h-screen {
+    height: 100vh !important;
+  }
+}
+
+/* =========================================================
+   Automated Dynamic Dark Theme Overrides
+   ========================================================= */
+.dark body, [data-theme="dark"] body {
+  background-color: #090d16 !important;
+  color: #f8fafc !important;
+}
+
+/* Background conversions */
+.dark .bg-white, [data-theme="dark"] .bg-white {
+  background-color: #0f172a !important;
+  color: #f8fafc;
+}
+
+.dark .bg-slate-50, [data-theme="dark"] .bg-slate-50 {
+  background-color: #090d16 !important;
+}
+
+.dark .bg-slate-100, [data-theme="dark"] .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+
+.dark .bg-slate-200, [data-theme="dark"] .bg-slate-200 {
+  background-color: #334155 !important;
+}
+
+.dark .bg-blue-50, [data-theme="dark"] .bg-blue-50 {
+  background-color: rgba(var(--color-primary-rgb, 37, 99, 235), 0.15) !important;
+}
+
+.dark .bg-emerald-50, [data-theme="dark"] .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+.dark .bg-indigo-50, [data-theme="dark"] .bg-indigo-50 {
+  background-color: rgba(var(--color-secondary-rgb, 99, 102, 241), 0.15) !important;
+}
+
+.dark .bg-orange-50, [data-theme="dark"] .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.15) !important;
+}
+
+/* Border conversions */
+.dark .border-slate-200, 
+.dark .border-slate-100,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-100 {
+  border-color: #1e293b !important;
+}
+
+.dark .border-blue-100, [data-theme="dark"] .border-blue-100 {
+  border-color: rgba(var(--color-primary-rgb, 37, 99, 235), 0.3) !important;
+}
+
+/* Typography conversions */
+.dark .text-slate-900, [data-theme="dark"] .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-800, [data-theme="dark"] .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-slate-700, [data-theme="dark"] .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-600, 
+.dark .text-slate-500,
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-blue-900, [data-theme="dark"] .text-blue-900 {
+  color: #93c5fd !important;
+}
+
+.dark .text-blue-700, [data-theme="dark"] .text-blue-700 {
+  color: #bfdbfe !important;
+}
+
+/* Form elements in dark mode */
+.dark input:not([type="color"]),
+.dark select,
+.dark textarea,
+[data-theme="dark"] input:not([type="color"]),
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+/* =========================================================
+   Universal Theme Dynamic Color Synchronization
+   Ensures ALL pages, buttons, badges, texts, icons, rings,
+   and gradients react instantly when Theme Preset / Color changes.
+   ========================================================= */
+
+/* 1. Primary Backgrounds & Buttons */
+.bg-blue-600,
+.bg-blue-700,
+.bg-blue-500 {
+  background-color: var(--color-primary) !important;
+}
+
+.hover\:bg-blue-700:hover,
+.hover\:bg-blue-600:hover,
+.hover\:bg-blue-500:hover {
+  background-color: var(--color-primary-hover) !important;
+}
+
+.active\:bg-blue-800:active {
+  background-color: var(--color-primary-active) !important;
+}
+
+.bg-blue-50,
+.bg-blue-100 {
+  background-color: var(--color-primary-light) !important;
+}
+
+.hover\:bg-blue-50:hover,
+.hover\:bg-blue-100:hover {
+  background-color: var(--color-primary-tonal) !important;
+}
+
+/* 2. Primary Text & Icons */
+.text-blue-600,
+.text-blue-500 {
+  color: var(--color-primary) !important;
+}
+
+.hover\:text-blue-600:hover,
+.hover\:text-blue-700:hover,
+.group:hover .group-hover\:text-blue-600 {
+  color: var(--color-primary-hover) !important;
+}
+
+.group:hover .group-hover\:bg-blue-600 {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+}
+
+.text-blue-700 {
+  color: var(--color-primary-hover) !important;
+}
+
+/* 3. Primary Borders */
+.border-blue-500,
+.border-blue-600 {
+  border-color: var(--color-primary) !important;
+}
+
+.border-blue-100,
+.border-blue-200,
+.border-blue-300 {
+  border-color: rgba(var(--color-primary-rgb, 37, 99, 235), 0.25) !important;
+}
+
+.hover\:border-blue-200:hover,
+.hover\:border-blue-300:hover,
+.group:hover .group-hover\:border-blue-200 {
+  border-color: rgba(var(--color-primary-rgb, 37, 99, 235), 0.5) !important;
+}
+
+/* 4. Focus Rings & Form Focus */
+.focus\:ring-blue-500:focus,
+.focus\:ring-blue-600:focus,
+.focus-within\:border-blue-500:focus-within {
+  --tw-ring-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.focus\:border-blue-500:focus,
+.focus\:border-blue-600:focus {
+  border-color: var(--color-primary) !important;
+}
+
+/* 5. Dynamic Gradients */
+.from-blue-600,
+.from-blue-500 {
+  --tw-gradient-from: var(--color-primary) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(var(--color-primary-rgb, 37, 99, 235), 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.to-indigo-600,
+.to-indigo-500,
+.to-blue-600,
+.to-blue-700 {
+  --tw-gradient-to: var(--color-secondary) var(--tw-gradient-to-position) !important;
+}
+
+.from-indigo-600,
+.from-indigo-500 {
+  --tw-gradient-from: var(--color-secondary) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(var(--color-secondary-rgb, 79, 70, 229), 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+/* 6. Secondary Accent Elements */
+.bg-indigo-50,
+.bg-indigo-100 {
+  background-color: var(--color-secondary-light) !important;
+}
+
+.text-indigo-600,
+.text-indigo-700,
+.text-indigo-500 {
+  color: var(--color-secondary) !important;
+}
+
+/* 7. Accent Highlights */
+.bg-amber-500,
+.bg-amber-600 {
+  background-color: var(--color-accent) !important;
+}
+
+.text-amber-500,
+.text-amber-400 {
+  color: var(--color-accent) !important;
+}
+
+.bg-amber-50,
+.bg-amber-100 {
+  background-color: var(--color-accent-light) !important;
+}
+
+/* 8. Dynamic Glow & Elevation Shadows */
+.shadow-blue-600\/20,
+.shadow-blue-600\/25,
+.shadow-blue-600\/30,
+.shadow-blue-600\/40 {
+  box-shadow: 0 10px 25px -5px rgba(var(--color-primary-rgb, 37, 99, 235), 0.3) !important;
+}
+
+/* 9. Utility classes */
+.theme-bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+.theme-text-primary {
+  color: var(--color-primary) !important;
+}
+
+.theme-border-primary {
+  border-color: var(--color-primary) !important;
+}
+
+.theme-bg-secondary {
+  background-color: var(--color-secondary) !important;
+}
+
+.theme-text-secondary {
+  color: var(--color-secondary) !important;
+}
+
+.theme-bg-accent {
+  background-color: var(--color-accent) !important;
+}
+
+.theme-text-accent {
+  color: var(--color-accent) !important;
 }
