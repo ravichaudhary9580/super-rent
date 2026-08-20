@@ -6,6 +6,7 @@ frontend:
         - npm install
     build:
       commands:
+        - env | grep -E '^(MONGODB_URI|NEXTAUTH_SECRET|NEXTAUTH_URL|REGION|ACCESS_KEY_ID|SECRET_ACCESS_KEY|S3_BUCKET_NAME)=' >> .env.production
         - npm run build
   artifacts:
     baseDirectory: .next

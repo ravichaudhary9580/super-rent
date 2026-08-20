@@ -163,24 +163,27 @@ export const authOptions: AuthOptions = {
         token.picture = (user as any).image || "";
       }
 
-      // Always fetch latest DB user status
-      let dbUser = null;
-      if (token.phone) {
-        dbUser = await User.findOne({ phone: token.phone });
-      } else if (token.id) {
-        dbUser = await User.findById(token.id);
-      }
+      // Fetch latest DB user status safely
+      try {
+        let dbUser = null;
+        if (token.phone) {
+          dbUser = await User.findOne({ phone: token.phone });
+        } else if (token.id) {
+          dbUser = await User.findById(token.id);
+        }
 
-      if (dbUser) {
-        token.id = dbUser._id.toString();
-        token.name = dbUser.name;
-        token.role = dbUser.role;
-        token.phone = dbUser.phone;
-        token.picture = dbUser.image || "";
-
-        // Strict check: if no role OR no phone, force onboarding!
-        token.requiresOnboarding = Boolean(!dbUser.role || !dbUser.phone);
-      } else {
+        if (dbUser) {
+          token.id = dbUser._id.toString();
+          token.name = dbUser.name;
+          token.role = dbUser.role;
+          token.phone = dbUser.phone;
+          token.picture = dbUser.image || "";
+          token.requiresOnboarding = Boolean(!dbUser.role || !dbUser.phone);
+        } else {
+          token.requiresOnboarding = Boolean(!token.role || !token.phone);
+        }
+      } catch (dbErr) {
+        console.error("[NextAuth JWT DB sync error]:", dbErr);
         token.requiresOnboarding = Boolean(!token.role || !token.phone);
       }
 
