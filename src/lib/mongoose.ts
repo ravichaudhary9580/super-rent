@@ -26,7 +26,7 @@ async function connectToDatabase() {
       return mongoose;
     });
   }
-    cached.conn = await cached.promise;
+  cached.conn = await cached.promise;
   return cached.conn;
 }
 

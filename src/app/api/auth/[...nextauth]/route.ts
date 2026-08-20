@@ -200,7 +200,7 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt"
   },
-  secret: process.env.NEXTAUTH_SECRET
+  secret: process.env.NEXTAUTH_SECRET || "superrent_secret_fallback_key_production_32char"
 };
 
 const handler = NextAuth(authOptions);
