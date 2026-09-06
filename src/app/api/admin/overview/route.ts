@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import connectDB from "@/lib/mongoose";
 import { User } from "@/models/User";
 import { Property } from "@/models/Property";
@@ -9,6 +10,9 @@ import { Wallet } from "@/models/Wallet";
 export async function GET() {
   try {
     await connectDB();
+
+    const isDbConnected = mongoose.connection.readyState === 1;
+    const platformHealth = isDbConnected ? "100% Operational" : "Degraded";
 
     const [totalUsers, totalTenants, totalOwners, totalProperties, totalLeads, debitTransactions] = await Promise.all([
       User.countDocuments(),
@@ -30,7 +34,7 @@ export async function GET() {
         activeListings: totalProperties,
         totalLeads,
         totalRevenue,
-        platformHealth: "100% Operational"
+        platformHealth
       }
     });
   } catch (error: any) {

@@ -61,48 +61,42 @@ export const authOptions: AuthOptions = {
         }
 
         // 2. STANDARD USER OTP AUTHENTICATION PATH
-        const isTestTenant = formattedPhone.includes("1122334455");
-        const isTestOwner = formattedPhone.includes("6677889900");
-        const isTestLogin = isTestTenant || isTestOwner;
-
-        if (!isTestLogin && !credentials.otp) {
+        if (!credentials.otp) {
           throw new Error("OTP code is required");
         }
 
         // Verify OTP for regular users
-        if (!isTestLogin) {
-          const validOtp = await Otp.findOne({
-            $or: [{ phone: formattedPhone }, { phone: credentials.phone }],
-            code: credentials.otp
-          });
+        const validOtp = await Otp.findOne({
+          $or: [{ phone: formattedPhone }, { phone: credentials.phone }],
+          code: credentials.otp
+        });
 
-          if (!validOtp) {
-            throw new Error("Invalid or expired OTP");
-          }
-
-          // Delete OTP after successful verification
-          await Otp.deleteOne({ _id: validOtp._id });
+        if (!validOtp) {
+          throw new Error("Invalid or expired OTP");
         }
+
+        // Delete OTP after successful verification
+        await Otp.deleteOne({ _id: validOtp._id });
 
         // Find existing user by normalized phone
         let user = await User.findOne({ 
           $or: [{ phone: formattedPhone }, { phone: credentials.phone }] 
         });
 
-        const userName = creds.name?.trim() || (isTestTenant ? "Test Tenant" : isTestOwner ? "Test Owner" : undefined);
+        const userName = creds.name?.trim();
 
         if (!user) {
-          // If no name was provided, this is a login attempt — block unregistered users (except test numbers)
-          if (!userName && !isTestLogin) {
+          // If no name was provided, this is a login attempt — block unregistered users
+          if (!userName) {
             throw new Error("No account found for this number. Please sign up first.");
           }
           try {
-            // Create a new user with supplied name (or default test role)
+            // Create a new user with supplied name
             user = await User.create({
               phone: formattedPhone,
-              name: userName || (isTestTenant ? "Test Tenant" : isTestOwner ? "Test Owner" : "New User"),
+              name: userName || "New User",
               email: `${formattedPhone.replace(/\+/g, "")}@superrent.local`,
-              role: isTestTenant ? "tenant" : isTestOwner ? "owner" : undefined
+              role: undefined
             });
           } catch (err: any) {
             // If race condition or duplicate key occurs, fetch existing user
@@ -115,14 +109,6 @@ export const authOptions: AuthOptions = {
           let needsSave = false;
           if (userName && (user.name === "New User" || !user.name)) {
             user.name = userName;
-            needsSave = true;
-          }
-          if (isTestTenant && user.role !== "tenant") {
-            user.role = "tenant";
-            needsSave = true;
-          }
-          if (isTestOwner && user.role !== "owner") {
-            user.role = "owner";
             needsSave = true;
           }
           if (needsSave) {

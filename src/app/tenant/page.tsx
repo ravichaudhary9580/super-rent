@@ -39,27 +39,67 @@ export default function TenantDashboard() {
         </Link>
       </div>
 
-      {/* Quick Stats */}
+      {/* Live Catalog Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="dashboard-card dashboard-card-rise stagger-1 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block group">
+        <Link
+          href="/tenant/properties"
+          className="dashboard-card dashboard-card-rise stagger-1 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block group hover:border-slate-300 transition-all"
+        >
           <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center sm:mb-4 shrink-0 group-hover:scale-110 transition-transform duration-300">
             <Building className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-0.5">{properties.length}</h3>
-            <p className="text-slate-500 font-medium text-xs sm:text-sm">Available Properties</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-0.5">
+              {isLoading ? "..." : properties.length}
+            </h3>
+            <p className="text-slate-800 font-bold text-xs sm:text-sm">Available Properties</p>
+            <p className="text-slate-400 text-[11px] mt-0.5">Verified owner listings</p>
           </div>
-        </div>
+        </Link>
 
-        <div className="dashboard-card dashboard-card-rise stagger-2 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block group">
+        <Link
+          href="/tenant/properties?type=Hostel"
+          className="dashboard-card dashboard-card-rise stagger-2 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block group hover:border-slate-300 transition-all"
+        >
+          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center sm:mb-4 shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <Building className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-0.5">
+              {isLoading
+                ? "..."
+                : properties.filter((p) => p.type === "Hostel" || p.type === "PG").length}
+            </h3>
+            <p className="text-slate-800 font-bold text-xs sm:text-sm">Hostels & PGs</p>
+            <p className="text-slate-400 text-[11px] mt-0.5">With food & amenities</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/tenant/properties"
+          className="dashboard-card dashboard-card-rise stagger-3 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block group hover:border-slate-300 transition-all"
+        >
           <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center sm:mb-4 shrink-0 group-hover:scale-110 transition-transform duration-300">
             <MapPin className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-0.5">0</h3>
-            <p className="text-slate-500 font-medium text-xs sm:text-sm">Active Inquiries</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-0.5">
+              {isLoading
+                ? "..."
+                : new Set(
+                    properties
+                      .map((p) =>
+                        typeof p.location === "object"
+                          ? p.location.area || p.location.city
+                          : p.location
+                      )
+                      .filter(Boolean)
+                  ).size}
+            </h3>
+            <p className="text-slate-800 font-bold text-xs sm:text-sm">Prime Localities</p>
+            <p className="text-slate-400 text-[11px] mt-0.5">Across education hubs</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Featured Properties */}

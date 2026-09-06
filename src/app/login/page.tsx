@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { Phone, Lock, User, Loader2, ArrowRight, Home } from "lucide-react";
+import { Phone, Lock, User, Loader2, ArrowRight } from "lucide-react";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -29,26 +29,6 @@ function LoginForm() {
     setStep("phone");
   };
 
-  const handleDirectLogin = async (loginPhone: string, userName?: string) => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const res = await signIn("credentials", {
-        name: userName || (loginPhone.includes("1122334455") ? "Test Tenant" : "Test Owner"),
-        phone: loginPhone,
-        otp: "123456",
-        redirect: true,
-        callbackUrl: "/onboarding",
-      });
-
-      if (res?.error) throw new Error(res.error);
-    } catch (err: any) {
-      setError(err.message);
-      setIsLoading(false);
-    }
-  };
-
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mode === "signup" && !name.trim()) {
@@ -58,11 +38,6 @@ function LoginForm() {
       return setError("Please enter a valid phone number");
     }
 
-    // Auto-bypass OTP for test numbers
-    if (phone.includes("1122334455") || phone.includes("6677889900")) {
-      return handleDirectLogin(phone, mode === "signup" ? name.trim() : undefined);
-    }
-    
     setIsLoading(true);
     setError("");
     
@@ -235,45 +210,6 @@ function LoginForm() {
             </button>
           </form>
         )}
-
-        {/* Quick Test Accounts */}
-        <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center mb-3">
-            Quick Test Logins (No OTP)
-          </p>
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={() => {
-                setPhone("1122334455");
-                handleDirectLogin("1122334455", "Test Tenant");
-              }}
-              className="py-2.5 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/50 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-xs font-semibold flex flex-col items-center justify-center transition-all gap-0.5"
-            >
-              <div className="flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span>Test Tenant</span>
-              </div>
-              <span className="text-[10px] text-blue-500 font-mono mt-0.5">1122334455</span>
-            </button>
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={() => {
-                setPhone("6677889900");
-                handleDirectLogin("6677889900", "Test Owner");
-              }}
-              className="py-2.5 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-xs font-semibold flex flex-col items-center justify-center transition-all gap-0.5"
-            >
-              <div className="flex items-center gap-1.5">
-                <Home className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Test Owner</span>
-              </div>
-              <span className="text-[10px] text-emerald-500 font-mono mt-0.5">6677889900</span>
-            </button>
-          </div>
-        </div>
 
         {/* Account Mode Switcher Footer */}
         <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-6 text-center space-y-3">
