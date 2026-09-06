@@ -33,7 +33,7 @@ export default function TenantDashboard() {
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Welcome Back!</h1>
           <p className="text-slate-500 text-sm mt-1">Here is what's happening with your property search.</p>
         </div>
-        <Link href="/tenant/properties" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2">
+        <Link href="/tenant/properties" className="dashboard-btn w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm flex items-center justify-center gap-2">
           <Search className="h-4 w-4" />
           <span>Explore Now</span>
         </Link>
@@ -41,8 +41,8 @@ export default function TenantDashboard() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block">
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center sm:mb-4 shrink-0">
+        <div className="dashboard-card dashboard-card-rise stagger-1 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block group">
+          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center sm:mb-4 shrink-0 group-hover:scale-110 transition-transform duration-300">
             <Building className="h-6 w-6" />
           </div>
           <div>
@@ -51,8 +51,8 @@ export default function TenantDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block">
-          <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center sm:mb-4 shrink-0">
+        <div className="dashboard-card dashboard-card-rise stagger-2 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-4 sm:block group">
+          <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center sm:mb-4 shrink-0 group-hover:scale-110 transition-transform duration-300">
             <MapPin className="h-6 w-6" />
           </div>
           <div>
@@ -63,11 +63,11 @@ export default function TenantDashboard() {
       </div>
 
       {/* Featured Properties */}
-      <div className="space-y-4">
+      <div className="space-y-4 dashboard-card-rise stagger-3">
         <div className="flex justify-between items-center">
           <h2 className="text-lg sm:text-xl font-bold text-slate-900">Featured Properties</h2>
-          <Link href="/tenant/properties" className="text-blue-600 text-xs sm:text-sm font-bold hover:underline flex items-center gap-1">
-            <span>View all</span> <ArrowRight className="h-4 w-4" />
+          <Link href="/tenant/properties" className="text-blue-600 text-xs sm:text-sm font-bold hover:underline flex items-center gap-1 group">
+            <span>View all</span> <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
         
@@ -78,21 +78,22 @@ export default function TenantDashboard() {
           </div>
         ) : properties.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6">
-            {properties.slice(0, 6).map((prop) => {
+            {properties.slice(0, 6).map((prop, idx) => {
               const propId = prop._id || prop.id || "";
               const loc = typeof prop.location === "object"
                 ? `${prop.location.area}, ${prop.location.city}`
                 : prop.location || "Bangalore";
               return (
-                <PropertyCard 
-                  key={propId}
-                  id={propId}
-                  title={prop.title}
-                  location={loc}
-                  price={prop.price}
-                  type={prop.type}
-                  href={`/tenant/properties/${propId}`}
-                />
+                <div key={propId} className={`dashboard-card dashboard-card-rise stagger-${Math.min(idx + 1, 6)} rounded-3xl`}>
+                  <PropertyCard 
+                    id={propId}
+                    title={prop.title}
+                    location={loc}
+                    price={prop.price}
+                    type={prop.type}
+                    href={`/tenant/properties/${propId}`}
+                  />
+                </div>
               );
             })}
           </div>

@@ -51,8 +51,13 @@ export default function AdminLoginPage() {
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <ShieldCheck className="w-9 h-9 text-white" />
+          <div className="flex items-center justify-center mb-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Provider App"
+              className="w-16 h-16 rounded-2xl object-contain shadow-xl shadow-amber-500/10"
+            />
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-black uppercase tracking-wider mb-2">
             <ShieldCheck className="w-3.5 h-3.5" /> Super Admin Portal

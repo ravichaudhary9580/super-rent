@@ -15,8 +15,8 @@ export interface ColorConfig {
 
 export const PRESET_THEMES: Record<Exclude<ThemePreset, "custom">, { name: string; colors: { primary: string; secondary: string; accent: string } }> = {
   ocean: {
-    name: "Ocean Royal",
-    colors: { primary: "#2563eb", secondary: "#4f46e5", accent: "#f59e0b" },
+    name: "Provider Violet (Default)",
+    colors: { primary: "#4c3cc7", secondary: "#6c5ce2", accent: "#f59e0b" },
   },
   emerald: {
     name: "Emerald Mint",
@@ -55,8 +55,8 @@ interface ThemeContextType {
 
 const DEFAULT_CONFIG: ColorConfig = {
   preset: "ocean",
-  primary: "#2563eb",
-  secondary: "#4f46e5",
+  primary: "#4c3cc7",
+  secondary: "#6c5ce2",
   accent: "#f59e0b",
   isDark: false,
   scale: 0.9, // Default: 90% (10% smaller)
@@ -95,9 +95,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("superrent_theme_config");
+      const saved = localStorage.getItem("providerapp_theme_config") || localStorage.getItem("superrent_theme_config");
       if (saved) {
         const parsed = JSON.parse(saved);
+        // Automatically migrate old default blue (#2563eb) to the official brand color (#4c3cc7)
+        if (parsed.primary === "#2563eb") {
+          parsed.primary = "#4c3cc7";
+          parsed.secondary = "#6c5ce2";
+        }
         setThemeConfig({ ...DEFAULT_CONFIG, ...parsed, scale: parsed.scale ?? 0.9 });
       }
     } catch (e) {
@@ -110,7 +115,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (!mounted) return;
 
     try {
-      localStorage.setItem("superrent_theme_config", JSON.stringify(themeConfig));
+      localStorage.setItem("providerapp_theme_config", JSON.stringify(themeConfig));
     } catch (e) {
       console.error("Failed to save theme config to localStorage", e);
     }

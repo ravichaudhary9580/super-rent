@@ -1,12 +1,13 @@
 {
-  "name": "super-rent-app",
+  "name": "provider-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:leads": "node scripts/seed-leads.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1110.0",

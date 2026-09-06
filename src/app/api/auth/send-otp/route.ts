@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (process.env.ACCESS_KEY_ID && process.env.SECRET_ACCESS_KEY) {
       try {
         const command = new PublishCommand({
-          Message: `Your SuperRent verification code is: ${code}. Valid for 5 minutes.`,
+          Message: `Your Provider App verification code is: ${code}. Valid for 5 minutes.`,
           PhoneNumber: formattedPhone,
           // IMPORTANT: Must be "Transactional" for OTPs sent to Indian (+91) numbers.
           // "Promotional" SMS is blocked by Indian carriers for numbers registered on DND.
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
             },
             "AWS.SNS.SMS.SenderID": {
               DataType: "String",
-              StringValue: "SUPRENT", // Up to 11 chars, alphanumeric
+              StringValue: "PROVAPP", // Up to 11 chars, alphanumeric
             },
           },
         });

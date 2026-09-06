@@ -70,21 +70,27 @@ export default function ExploreProperties() {
           </div>
         ) : properties.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {properties.map((prop) => {
+            {properties.map((prop, idx) => {
               const propId = prop._id || prop.id || "";
               const loc = typeof prop.location === "object"
                 ? `${prop.location.area}, ${prop.location.city}`
-                : prop.location || "Bangalore";
+                : prop.location || "Greater Noida";
               return (
-                <PropertyCard
-                  key={propId}
-                  id={propId}
-                  title={prop.title}
-                  location={loc}
-                  price={prop.price}
-                  type={prop.type}
-                  href={`/properties/${propId}`}
-                />
+                <div key={propId} className={`dashboard-card dashboard-card-rise stagger-${Math.min((idx % 8) + 1, 8)} rounded-2xl`}>
+                  <PropertyCard
+                    id={propId}
+                    title={prop.title}
+                    location={loc}
+                    price={prop.price}
+                    type={prop.type}
+                    pricingCycle={prop.pricingCycle}
+                    occupancy={prop.occupancy}
+                    sharingOptions={prop.sharingOptions}
+                    roomPricings={prop.roomPricings}
+                    imageUrl={prop.images && prop.images.length > 0 ? prop.images[0] : undefined}
+                    href={`/properties/${propId}`}
+                  />
+                </div>
               );
             })}
           </div>

@@ -15,7 +15,7 @@ export default function AdminProfile() {
           </div>
           <div className="space-y-1.5">
             <h2 className="text-2xl font-black text-slate-900">System Administrator</h2>
-            <p className="text-slate-500 text-sm font-medium">admin@superrent.com</p>
+            <p className="text-slate-500 text-sm font-medium">admin@providerapp.com</p>
             <div className="pt-2">
               <span className="inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-purple-200">
                 <Shield className="w-3.5 h-3.5" /> SUPER ADMIN

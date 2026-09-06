@@ -112,7 +112,13 @@ export default function OnboardingPage() {
         {step === "role" && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">How will you use SuperRent?</h1>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="Provider App"
+                className="w-16 h-16 rounded-2xl mx-auto mb-4 object-contain shadow-lg shadow-purple-500/15"
+              />
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">How will you use Provider App?</h1>
               <p className="text-slate-500 text-lg">Select your primary goal to personalize your experience.</p>
             </div>
 

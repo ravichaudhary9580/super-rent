@@ -6,8 +6,13 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SuperRent - Property Booking & Leads",
+  title: "Provider App - Property Booking & Leads",
   description: "The smartest way to rent and lease.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

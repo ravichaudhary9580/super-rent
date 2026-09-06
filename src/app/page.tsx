@@ -34,7 +34,7 @@ const STATS = [
   { value: "50,000+", label: "Verified Beds", color: "text-blue-600" },
   { value: "₹0", label: "Zero Brokerage", color: "text-emerald-600" },
   { value: "25+", label: "Cities Covered", color: "text-indigo-600" },
-  { value: "4.9★", label: "User Rating", color: "text-amber-500" },
+  { value: "4.9 / 5", label: "User Rating", color: "text-amber-500" },
 ];
 
 const PROPERTY_TYPES = [
@@ -132,7 +132,7 @@ const TESTIMONIALS = [
     name: "Rahul Mehta",
     role: "IT Professional, Pune",
     review:
-      "The lead quality on SuperRent is exceptional. My hostel has been at 98% occupancy for the last 6 months because of the platform.",
+      "The lead quality on Provider App is exceptional. My hostel has been at 98% occupancy for the last 6 months because of the platform.",
     rating: 5,
     avatar: "RM",
     color: "bg-blue-600",
@@ -150,7 +150,7 @@ const TESTIMONIALS = [
 
 const FAQS = [
   {
-    q: "Is SuperRent really 100% zero brokerage for tenants?",
+    q: "Is Provider App really 100% zero brokerage for tenants?",
     a: "Absolutely. Tenants connect directly with verified property owners at zero cost — no registration fees, no booking charges, and no commission ever.",
   },
   {
@@ -166,7 +166,7 @@ const FAQS = [
     a: "Most students visit and move in within 24–48 hours of their first inquiry. Our direct-contact model eliminates delays caused by intermediaries.",
   },
   {
-    q: "What cities are covered by SuperRent?",
+    q: "What cities are covered by Provider App?",
     a: "We're live in 25+ major Indian cities including Bangalore, Pune, Hyderabad, Delhi NCR, Mumbai, Chennai, Kolkata, Ahmedabad, and expanding monthly.",
   },
 ];
@@ -207,11 +207,10 @@ export default function LandingPage() {
 
       {/* ─── NAVIGATION ────────────────────────────────────── */}
       <header className="sticky top-0 z-50 pointer-events-none" style={{ color: "#0f172a" }}>
-        <div className={`pointer-events-auto transition-all duration-500 ${
-          scrolled
+        <div className={`pointer-events-auto transition-all duration-500 ${scrolled
             ? "mx-3 sm:mx-6 lg:mx-auto lg:max-w-5xl mt-3 rounded-2xl border border-slate-200/80 shadow-xl shadow-slate-900/10"
             : "border-b border-slate-100"
-        }`}
+          }`}
           style={{
             background: scrolled
               ? "rgba(255,255,255,0.88)"
@@ -224,16 +223,16 @@ export default function LandingPage() {
             <div className={`flex justify-between items-center ${scrolled ? "h-14 sm:h-16" : "h-16 sm:h-20"} transition-all duration-300`}>
 
               {/* Logo */}
-              <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-                <div
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
-                  style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", color: "#ffffff" }}
-                >
-                  <Building className="w-4 h-4 sm:w-5 sm:h-5" />
-                </div>
+              <Link href="/" className="flex items-center gap-3 group shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png"
+                  alt="Provider App"
+                  className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl object-contain shadow-md group-hover:scale-105 group-hover:rotate-2 transition-all duration-300"
+                />
                 <div className="leading-none">
                   <span className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                    Super<span style={{ color: "#2563eb" }}>Rent</span>
+                    Provider<span style={{ color: "#4c3cc7" }}> App</span>
                   </span>
                   {!scrolled && (
                     <span className="hidden sm:block text-[9px] font-bold tracking-[0.15em] uppercase text-slate-400 mt-0.5">
@@ -259,10 +258,15 @@ export default function LandingPage() {
                     <Link
                       key={item.label}
                       href={item.href}
+                      onClick={() => {
+                        if (item.href === "#for-owners") {
+                          setActiveTab("owners");
+                        }
+                      }}
                       className="relative px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition-all duration-200 group"
                     >
                       {item.label}
-                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: "#2563eb" }} />
+                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: "#4c3cc7" }} />
                     </Link>
                   ))}
                 </div>
@@ -274,7 +278,7 @@ export default function LandingPage() {
                   href="/login"
                   className="text-sm font-semibold px-4 py-2 rounded-xl transition-all"
                   style={{ color: "#475569" }}
-                  onMouseEnter={e => { (e.target as HTMLElement).style.color = "#2563eb"; (e.target as HTMLElement).style.background = "#eff6ff"; }}
+                  onMouseEnter={e => { (e.target as HTMLElement).style.color = "#4c3cc7"; (e.target as HTMLElement).style.background = "#f3f2fd"; }}
                   onMouseLeave={e => { (e.target as HTMLElement).style.color = "#475569"; (e.target as HTMLElement).style.background = "transparent"; }}
                 >
                   Sign In
@@ -283,9 +287,9 @@ export default function LandingPage() {
                   href="/signup"
                   className="text-sm font-bold px-5 py-2.5 rounded-xl transition-all active:scale-95 hover:opacity-90 hover:shadow-lg"
                   style={{
-                    background: "linear-gradient(135deg, #2563eb, #4f46e5)",
+                    background: "linear-gradient(135deg, #4c3cc7, #6c5ce2)",
                     color: "#ffffff",
-                    boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
+                    boxShadow: "0 4px 12px rgba(76,60,199,0.35)",
                   }}
                 >
                   Get Started →
@@ -328,10 +332,15 @@ export default function LandingPage() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (item.href === "#for-owners") {
+                      setActiveTab("owners");
+                    }
+                  }}
                   className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-colors"
                   style={{ color: "#334155" }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "#eff6ff"; el.style.color = "#2563eb"; }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "#f3f2fd"; el.style.color = "#4c3cc7"; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = "transparent"; el.style.color = "#334155"; }}
                 >
                   {item.label}
@@ -343,7 +352,7 @@ export default function LandingPage() {
                   href="/signup"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block w-full text-center font-bold text-sm py-3 rounded-xl"
-                  style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", color: "#ffffff" }}
+                  style={{ background: "linear-gradient(135deg, #4c3cc7, #6c5ce2)", color: "#ffffff" }}
                 >
                   Get Started Free →
                 </Link>
@@ -372,7 +381,7 @@ export default function LandingPage() {
             {/* Top Badge */}
             <div data-animate="pop" data-delay="50" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs sm:text-sm font-bold mb-6 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              <span>India's #1 Zero Brokerage Accommodation Platform</span>
+              <span>India&apos;s #1 Zero Brokerage Accommodation Platform</span>
             </div>
 
             {/* Headline */}
@@ -381,7 +390,7 @@ export default function LandingPage() {
               <span
                 className="block"
                 style={{
-                  background: "linear-gradient(to right, #2563eb, #4f46e5, #9333ea)",
+                  background: "linear-gradient(to right, #4c3cc7, #6c5ce2, #9333ea)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -529,7 +538,7 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-16">
             <p data-animate="fade-down" className="text-xs font-black uppercase tracking-widest text-indigo-600 mb-2">3 Simple Steps</p>
-            <h2 data-animate="blur-in" data-delay="100" className="text-3xl sm:text-4xl font-black text-slate-900">How SuperRent Works</h2>
+            <h2 data-animate="blur-in" data-delay="100" className="text-3xl sm:text-4xl font-black text-slate-900">How Provider App Works</h2>
             <p data-animate="fade-up" data-delay="200" className="text-slate-500 text-sm mt-3 max-w-xl mx-auto">Move into your verified accommodation in less than 48 hours.</p>
           </div>
 
@@ -577,10 +586,10 @@ export default function LandingPage() {
               {(["tenants", "owners"] as const).map((tab) => (
                 <button
                   key={tab}
+                  type="button"
                   onClick={() => setActiveTab(tab)}
-                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold capitalize transition-all whitespace-nowrap ${
-                    activeTab === tab ? "bg-white text-slate-900 shadow-sm scale-100" : "text-slate-600 hover:text-slate-800"
-                  }`}
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold capitalize transition-all whitespace-nowrap cursor-pointer ${activeTab === tab ? "bg-white text-slate-900 shadow-sm scale-100" : "text-slate-600 hover:text-slate-800"
+                    }`}
                 >
                   {tab === "tenants" ? (
                     <span className="inline-flex items-center gap-1.5"><GraduationCap className="w-4 h-4" /> For Students & Tenants</span>
@@ -593,8 +602,8 @@ export default function LandingPage() {
           </div>
 
           {activeTab === "tenants" ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center">
-              <div data-animate="fade-left" data-delay="100" className="order-2 lg:order-1">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-in fade-in duration-300">
+              <div className="order-2 lg:order-1">
                 <p className="text-xs font-black uppercase tracking-widest text-blue-600 mb-3">Tenant Benefits</p>
                 <h3 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight mb-5">
                   Safe, Verified Rooms.<br />
@@ -628,15 +637,15 @@ export default function LandingPage() {
               </div>
 
               {/* Visual Card */}
-              <div data-animate="tilt-in" data-delay="250" className="order-1 lg:order-2 bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-                <div className="p-5 sm:p-6" style={{ background: "linear-gradient(to right, #2563eb, #4f46e5)", color: "#ffffff" }}>
-                  <h4 className="font-black text-lg sm:text-xl" style={{ color: "#ffffff" }}>Broker vs SuperRent</h4>
+              <div className="order-1 lg:order-2 bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+                <div className="p-5 sm:p-6" style={{ background: "linear-gradient(to right, #4c3cc7, #6c5ce2)", color: "#ffffff" }}>
+                  <h4 className="font-black text-lg sm:text-xl" style={{ color: "#ffffff" }}>Broker vs Provider App</h4>
                   <p className="text-xs mt-1" style={{ color: "#bfdbfe" }}>What you save every time you use us</p>
                 </div>
                 <div className="p-5 sm:p-6 space-y-4">
                   {[
                     { label: "Traditional Broker", value: "₹10,000–₹18,000", bad: true, note: "1–1.5 months rent as commission" },
-                    { label: "SuperRent Platform", value: "₹0", bad: false, note: "100% free for life" },
+                    { label: "Provider App Platform", value: "₹0", bad: false, note: "100% free for life" },
                   ].map((row) => (
                     <div key={row.label} className={`p-4 rounded-2xl border ${row.bad ? "bg-red-50 border-red-200" : "bg-emerald-50 border-emerald-200"}`}>
                       <div className="flex items-center justify-between">
@@ -654,15 +663,15 @@ export default function LandingPage() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center">
-              <div data-animate="fade-left" data-delay="100">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center animate-in fade-in duration-300">
+              <div>
                 <p className="text-xs font-black uppercase tracking-widest text-indigo-600 mb-3">Owner Benefits</p>
                 <h3 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight mb-5">
                   Fill Vacant Beds Faster.<br />
                   <span className="text-indigo-600">High-Intent Leads Daily.</span>
                 </h3>
                 <p className="text-slate-500 text-sm sm:text-base leading-relaxed mb-7">
-                  SuperRent's intelligent engine routes verified student and professional inquiries directly to your inbox in real time.
+                  Provider App's intelligent engine routes verified student and professional inquiries directly to your inbox in real time.
                 </p>
                 <div className="space-y-3 mb-8">
                   {[
@@ -689,7 +698,7 @@ export default function LandingPage() {
               </div>
 
               {/* Live Lead Preview */}
-              <div data-animate="tilt-in" data-delay="250" className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
                 <div className="p-5 sm:p-6 flex items-center justify-between" style={{ background: "linear-gradient(to right, #4f46e5, #9333ea)", color: "#ffffff" }}>
                   <div>
                     <h4 className="font-black text-lg" style={{ color: "#ffffff" }}>Live Lead Marketplace</h4>
@@ -775,7 +784,7 @@ export default function LandingPage() {
           <div className="text-center mb-10 sm:mb-14">
             <p data-animate="fade-down" className="text-xs font-black uppercase tracking-widest text-blue-600 mb-2">FAQ</p>
             <h2 data-animate="blur-in" data-delay="100" className="text-3xl sm:text-4xl font-black text-slate-900">Got Questions?</h2>
-            <p data-animate="fade-up" data-delay="200" className="text-slate-500 text-sm mt-3">Everything you need to know about SuperRent.</p>
+            <p data-animate="fade-up" data-delay="200" className="text-slate-500 text-sm mt-3">Everything you need to know about Provider App.</p>
           </div>
 
           <div className="space-y-3">
@@ -819,8 +828,8 @@ export default function LandingPage() {
             data-animate="pop"
             className="relative rounded-3xl overflow-hidden p-8 sm:p-16 text-center"
             style={{
-              background: "linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%)",
-              boxShadow: "0 25px 50px -12px rgba(37,99,235,0.4)",
+              background: "linear-gradient(135deg, #4c3cc7 0%, #6c5ce2 50%, #7c3aed 100%)",
+              boxShadow: "0 25px 50px -12px rgba(76,60,199,0.4)",
               color: "#ffffff",
             }}
           >
@@ -841,7 +850,7 @@ export default function LandingPage() {
                 Ready to Find Your <br className="hidden sm:inline" />Perfect Room?
               </h2>
               <p data-animate="fade-up" data-delay="300" className="text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "#bfdbfe" }}>
-                Join thousands of happy tenants and hostel owners who trust SuperRent for seamless, brokerage-free accommodation.
+                Join thousands of happy tenants and hostel owners who trust Provider App for seamless, brokerage-free accommodation.
               </p>
 
               <div data-animate="pop" data-delay="400" className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -871,11 +880,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
             {/* Brand */}
             <div className="col-span-2 sm:col-span-2 md:col-span-1 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white">
-                  <Building className="w-5 h-5" />
-                </div>
-                <span className="text-xl font-black text-white">SuperRent</span>
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png"
+                  alt="Provider App"
+                  className="w-10 h-10 rounded-2xl object-contain shadow"
+                />
+                <span className="text-xl font-black text-white">Provider App</span>
               </div>
               <p className="text-xs leading-relaxed max-w-48">
                 India's premier zero-brokerage accommodation platform. Connecting students and owners directly.
@@ -927,13 +939,13 @@ export default function LandingPage() {
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
                   <span>Instant Contact</span>
                 </li>
-                <li className="text-slate-500 pt-1">support@superrent.com</li>
+                <li className="text-slate-500 pt-1">support@providerapp.com</li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
-            <p>© {new Date().getFullYear()} SuperRent Inc. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Provider App Inc. All rights reserved.</p>
             <div className="flex items-center gap-5">
               {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((item) => (
                 <Link key={item} href="/properties" className="hover:text-slate-300 transition-colors">{item}</Link>

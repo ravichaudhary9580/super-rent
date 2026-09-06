@@ -85,7 +85,7 @@ export default function AdminDashboard() {
         
         <Link 
           href="/admin/leads"
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm transition-all flex items-center gap-2"
+          className="dashboard-btn px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm flex items-center gap-2"
         >
           <Sparkles className="w-4 h-4" />
           <span>Review Leads</span>
@@ -93,20 +93,20 @@ export default function AdminDashboard() {
       </div>
 
       {isLoading ? (
-        <div className="py-20 text-center bg-white rounded-3xl border border-slate-200">
+        <div className="py-20 text-center bg-white rounded-3xl border border-slate-200 dashboard-card-rise">
           <Loader2 className="w-10 h-10 animate-spin text-blue-600 mx-auto mb-3" />
           <p className="text-slate-500 font-bold text-sm">Calculating platform metrics...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {cards.map((metric) => (
+          {cards.map((metric, idx) => (
             <Link 
               key={metric.title} 
               href={metric.href}
-              className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex items-center justify-between group"
+              className={`dashboard-card dashboard-card-rise stagger-${idx + 1} bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between group`}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 ${metric.bg} ${metric.color} rounded-2xl flex items-center justify-center shrink-0`}>
+                <div className={`w-12 h-12 ${metric.bg} ${metric.color} rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300`}>
                   {metric.icon}
                 </div>
                 <div>
@@ -124,11 +124,11 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         <Link 
           href="/admin/leads"
-          className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group"
+          className="dashboard-card dashboard-card-rise stagger-5 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm group"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="p-2.5 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs">Leads Distribution</span>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1.5 transition-all duration-300" />
           </div>
           <h4 className="font-extrabold text-slate-900 text-base">Global Leads Oversight</h4>
           <p className="text-slate-500 text-xs mt-1">Verify tenant requirements, edit lead pricing, and adjust exclusivity.</p>
@@ -136,11 +136,11 @@ export default function AdminDashboard() {
 
         <Link 
           href="/admin/owners"
-          className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group"
+          className="dashboard-card dashboard-card-rise stagger-6 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm group"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-xs">Wallet & Revenue</span>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1.5 transition-all duration-300" />
           </div>
           <h4 className="font-extrabold text-slate-900 text-base">Hostel & PG Owners</h4>
           <p className="text-slate-500 text-xs mt-1">Grant manual wallet credits, monitor lead transactions, and view accounts.</p>
@@ -148,18 +148,18 @@ export default function AdminDashboard() {
 
         <Link 
           href="/admin/theme"
-          className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group"
+          className="dashboard-card dashboard-card-rise stagger-7 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm group"
         >
           <div className="flex items-center justify-between mb-3">
             <span className="p-2.5 bg-purple-50 text-purple-600 rounded-xl font-bold text-xs">Portal Customization</span>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 group-hover:translate-x-1.5 transition-all duration-300" />
           </div>
           <h4 className="font-extrabold text-slate-900 text-base">Brand Theme Studio</h4>
           <p className="text-slate-500 text-xs mt-1">Configure brand color presets, light/dark appearance, and UI display scale.</p>
         </Link>
       </div>
 
-      <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10">
+      <div className="dashboard-card-rise stagger-8 bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-slate-900/10">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
           <h2 className="text-lg sm:text-xl font-bold">System Status: {stats.platformHealth}</h2>

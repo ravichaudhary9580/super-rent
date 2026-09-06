@@ -21,7 +21,7 @@ export async function sendInstantNotification(payload: NotificationPayload) {
   if (process.env.ACCESS_KEY_ID && process.env.SECRET_ACCESS_KEY && recipientPhone) {
     try {
       const command = new PublishCommand({
-        Message: `[SuperRent Alert] ${message}`,
+        Message: `[Provider App Alert] ${message}`,
         PhoneNumber: recipientPhone,
       });
       await snsClient.send(command);

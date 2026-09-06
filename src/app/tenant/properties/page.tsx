@@ -14,10 +14,18 @@ interface PropertyItem {
     fullAddress?: string;
   } | string;
   price: number;
+  pricingCycle?: "Monthly" | "Annually";
   type: string;
+  occupancy?: string;
+  sharingOptions?: string[];
   status?: string;
   amenities?: string[];
   images?: string[];
+  roomPricings?: Array<{
+    seater: string;
+    acPrice?: number | null;
+    nonAcPrice?: number | null;
+  }>;
 }
 
 export default function TenantPropertiesPage() {
@@ -104,7 +112,7 @@ export default function TenantPropertiesPage() {
               >
                 {cities.map((city) => (
                   <option key={city} value={city}>
-                    {city === "All" ? "📍 All Cities" : `📍 ${city}`}
+                    {city === "All" ? "All Cities" : city}
                   </option>
                 ))}
               </select>
@@ -118,8 +126,8 @@ export default function TenantPropertiesPage() {
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none cursor-pointer"
               >
                 <option value="featured">Featured First</option>
-                <option value="price-asc">💸 Price: Low to High</option>
-                <option value="price-desc">💎 Price: High to Low</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
               </select>
             </div>
           </div>
@@ -179,6 +187,11 @@ export default function TenantPropertiesPage() {
                 location={locationStr}
                 price={prop.price}
                 type={prop.type}
+                pricingCycle={prop.pricingCycle}
+                occupancy={prop.occupancy}
+                sharingOptions={prop.sharingOptions}
+                roomPricings={prop.roomPricings}
+                imageUrl={prop.images && prop.images.length > 0 ? prop.images[0] : undefined}
                 href={`/tenant/properties/${propId}`}
               />
             );

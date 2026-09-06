@@ -342,7 +342,7 @@ export default function TenantProfile() {
           <div className="relative group shrink-0">
             <div
               className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden flex items-center justify-center text-3xl sm:text-4xl font-black text-white shadow-xl relative"
-              style={{ backgroundColor: "var(--color-primary, #2563eb)" }}
+              style={{ backgroundColor: "var(--color-primary, #4c3cc7)" }}
             >
               {formData.image ? (
                 // eslint-disable-next-line @next/next/no-img-element

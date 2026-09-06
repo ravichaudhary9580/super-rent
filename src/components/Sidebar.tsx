@@ -123,9 +123,10 @@ export function Sidebar({ role }: SidebarProps) {
     <>
       {/* 1. Mobile Top Minimal Header (Not frozen/sticky, scrolls naturally) */}
       <header className="md:hidden bg-slate-900 text-white border-b border-slate-800 px-4 py-3 flex items-center justify-between relative z-20 shadow-sm">
-        <Link href={role === "admin" ? "/admin" : role === "owner" ? "/owner" : "/tenant"} className="flex items-center gap-2">
-          <Building className="h-6 w-6 shrink-0" style={{ color: "var(--color-primary)" }} />
-          <span className="font-black text-lg text-white tracking-tight">SuperRent</span>
+        <Link href={role === "admin" ? "/admin" : role === "owner" ? "/owner" : "/tenant"} className="flex items-center gap-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Provider App" className="w-7 h-7 object-contain rounded-lg shrink-0" />
+          <span className="font-black text-lg text-white tracking-tight">Provider App</span>
         </Link>
 
         {/* Profile Avatar Button (Tapping opens Right-Slide Sidebar) */}
@@ -358,11 +359,12 @@ export function Sidebar({ role }: SidebarProps) {
         <div className="flex flex-col min-h-0 flex-1">
           {/* Header with Pin / Unpin Button */}
           <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800 shrink-0">
-            <div className={`flex items-center ${!isExpanded ? "justify-center w-full" : "gap-2 px-2"}`}>
-              <Building className="h-7 w-7 shrink-0 transition-colors" style={{ color: "var(--color-primary)" }} />
+            <div className={`flex items-center ${!isExpanded ? "justify-center w-full" : "gap-3 px-2"}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Provider App" className="w-8 h-8 object-contain rounded-xl shrink-0" />
               {isExpanded && (
                 <span className="text-xl font-extrabold text-white tracking-tight animate-in fade-in duration-200">
-                  SuperRent
+                  Provider App
                 </span>
               )}
             </div>
@@ -393,16 +395,16 @@ export function Sidebar({ role }: SidebarProps) {
                   key={link.name}
                   href={link.href}
                   title={!isExpanded ? link.name : undefined}
-                  className={`flex items-center gap-3.5 px-3 py-3 rounded-xl transition-all duration-200 ${
+                  className={`flex items-center gap-3.5 px-3 py-3 rounded-xl transition-all duration-200 group ${
                     !isExpanded ? "justify-center" : ""
                   } ${
                     isActive
-                      ? "text-white font-bold shadow-lg"
-                      : "hover:bg-slate-800/80 hover:text-white"
+                      ? "text-white font-bold shadow-lg shadow-blue-600/25 scale-[1.02]"
+                      : "hover:bg-slate-800/80 hover:text-white hover:translate-x-0.5"
                   }`}
                   style={isActive ? { backgroundColor: "var(--color-primary)" } : undefined}
                 >
-                  <span className="shrink-0">{link.icon}</span>
+                  <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">{link.icon}</span>
                   {isExpanded && (
                     <span className="font-semibold text-sm truncate animate-in fade-in duration-150">
                       {link.name}
@@ -479,7 +481,7 @@ export function Sidebar({ role }: SidebarProps) {
               Confirm Log Out
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-              Are you sure you want to end your current session and sign out of SuperRent?
+              Are you sure you want to end your current session and sign out of Provider App?
             </p>
 
             <div className="grid grid-cols-2 gap-3">

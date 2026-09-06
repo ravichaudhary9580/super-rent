@@ -35,7 +35,12 @@ export const authOptions: AuthOptions = {
         // 1. ADMIN PASSWORD AUTHENTICATION PATH
         if (creds.password) {
           let adminUser = await User.findOne({
-            $or: [{ phone: formattedPhone }, { phone: credentials.phone }, { email: "admin@superrent.com" }]
+            $or: [
+              { phone: formattedPhone },
+              { phone: credentials.phone },
+              { email: "admin@providerapp.com" },
+              { email: "admin@superrent.com" }
+            ]
           });
 
           if (!adminUser || adminUser.role !== "admin") {
