@@ -26,6 +26,11 @@ export interface IUser extends Document {
   emailVerified?: Date | null;
   razorpayCustomerId?: string;
   savedProperties?: mongoose.Types.ObjectId[];
+  businessName?: string;
+  hostelName?: string;
+  propertyType?: string;
+  capacity?: string;
+  onboardingCompleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -56,7 +61,12 @@ const UserSchema = new Schema<IUser>(
     role: { type: String, enum: ["tenant", "owner", "admin"] },
     emailVerified: { type: Date, default: null },
     razorpayCustomerId: { type: String },
-    savedProperties: [{ type: Schema.Types.ObjectId, ref: "Property" }]
+    savedProperties: [{ type: Schema.Types.ObjectId, ref: "Property" }],
+    businessName: { type: String, default: "" },
+    hostelName: { type: String, default: "" },
+    propertyType: { type: String, default: "" },
+    capacity: { type: String, default: "" },
+    onboardingCompleted: { type: Boolean, default: false }
   },
   { timestamps: true, strict: false }
 );

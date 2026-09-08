@@ -34,7 +34,34 @@ export default function TenantPropertyDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [hasContacted, setHasContacted] = useState(false);
+  const [hasRequestedAssistance, setHasRequestedAssistance] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  const handleContactOwner = async () => {
+    setHasContacted(true);
+    try {
+      await fetch("/api/leads/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyId: id, action: "contact" })
+      });
+    } catch (e) {
+      console.error("Failed to track contact attempt:", e);
+    }
+  };
+
+  const handleRequestAssistance = async () => {
+    setHasRequestedAssistance(true);
+    try {
+      await fetch("/api/leads/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyId: id, action: "conversion" })
+      });
+    } catch (e) {
+      console.error("Failed to track assisted conversion:", e);
+    }
+  };
 
   useEffect(() => {
     async function loadProperty() {
@@ -45,6 +72,12 @@ export default function TenantPropertyDetails() {
         if (res.ok) {
           const data = await res.json();
           setProperty(data.property);
+          // Track property view action for lead engine
+          fetch("/api/leads/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ propertyId: id, action: "view" })
+          }).catch(() => {});
         }
       } catch (err) {
         console.error(err);
@@ -490,14 +523,31 @@ export default function TenantPropertyDetails() {
                 </a>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => setHasContacted(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-base shadow-lg shadow-blue-600/25 hover:shadow-xl transition-all flex items-center justify-center gap-2 active:scale-98"
-              >
-                <PhoneCall className="h-5 w-5" />
-                Contact Owner Now
-              </button>
+              <div className="space-y-2.5">
+                <button
+                  type="button"
+                  onClick={handleContactOwner}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-base shadow-lg shadow-blue-600/25 hover:shadow-xl transition-all flex items-center justify-center gap-2 active:scale-98"
+                >
+                  <PhoneCall className="h-5 w-5" />
+                  Contact Owner Now
+                </button>
+
+                {hasRequestedAssistance ? (
+                  <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl text-center text-xs font-bold text-purple-900 flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                    <span>Assisted Conversion Requested! Our advisor will call you shortly.</span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleRequestAssistance}
+                    className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold rounded-2xl border border-slate-200/80 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <span>Request Assisted Booking & Visit Support</span>
+                  </button>
+                )}
+              </div>
             )}
 
             <p className="text-center text-[11px] text-slate-400 leading-relaxed">

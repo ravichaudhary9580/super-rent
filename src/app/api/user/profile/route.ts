@@ -4,6 +4,9 @@ import connectDB from "@/lib/mongoose";
 import { User } from "@/models/User";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { deleteFromS3 } from "@/lib/s3";
+import { Wallet } from "@/models/Wallet";
+import { Property } from "@/models/Property";
+import { Lead } from "@/models/Lead";
 
 // GET: Fetch current user profile
 export async function GET(req: NextRequest) {
@@ -27,9 +30,24 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    let stats = null;
+    if (user.role === "owner") {
+      const wallet = await Wallet.findOne({ userId: user._id });
+      const propertiesCount = await Property.countDocuments({ ownerId: user._id });
+      const purchasedLeadsCount = await Lead.countDocuments({ unlockedBy: user._id });
+
+      stats = {
+        walletBalance: wallet ? wallet.balance : 500,
+        totalSpent: wallet ? wallet.totalSpent : 0,
+        propertiesCount: propertiesCount || 0,
+        purchasedLeadsCount: purchasedLeadsCount || 0
+      };
+    }
+
     return NextResponse.json({
       success: true,
-      user
+      user,
+      stats
     });
   } catch (error: any) {
     console.error("Error fetching profile:", error);
@@ -61,7 +79,9 @@ export async function PUT(req: NextRequest) {
       bio,
       whatsappOptIn,
       emergencyContact,
-      image
+      image,
+      businessName,
+      hostelName
     } = body;
 
     if (!name || !name.trim()) {
@@ -70,7 +90,7 @@ export async function PUT(req: NextRequest) {
 
     await connectDB();
 
-    const user = await User.findOne({
+    const user = await User.findOne({ 
       $or: [
         { _id: (session.user as any).id },
         { phone: (session.user as any).phone },
@@ -85,6 +105,12 @@ export async function PUT(req: NextRequest) {
     const updateData: any = {
       name: name.trim()
     };
+
+    if (businessName !== undefined || hostelName !== undefined) {
+      const bName = (businessName || hostelName || "").trim();
+      updateData.businessName = bName;
+      updateData.hostelName = bName;
+    }
 
     if (email !== undefined) updateData.email = email.trim();
     if (city !== undefined) updateData.city = city.trim();

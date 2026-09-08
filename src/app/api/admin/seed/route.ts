@@ -15,7 +15,7 @@ async function seedAdminUser() {
     await connectDB();
 
     const adminPhone = "+919999999999";
-    const adminEmail = "admin@superrent.com";
+    const adminEmail = "admin@providerapp.com";
     const adminPassword = "admin123";
 
     let admin = await User.findOne({

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/lib/mongoose";
+import { User } from "@/models/User";
 import { Lead } from "@/models/Lead";
 import { Wallet } from "@/models/Wallet";
 import { Transaction } from "@/models/Transaction";
@@ -8,20 +10,33 @@ import { sendInstantNotification } from "@/lib/notifications";
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession();
-    const buyerUserId = (session?.user as any)?.id;
-    const buyerPhone = (session?.user as any)?.phone;
-
-    if (!session || !buyerUserId) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized. Please sign in as an owner/buyer." }, { status: 401 });
     }
+
+    await connectDB();
+
+    const sessionUser = session.user as any;
+    const dbUser = await User.findOne({
+      $or: [
+        { _id: sessionUser.id },
+        { phone: sessionUser.phone },
+        { email: sessionUser.email }
+      ].filter(Boolean)
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ error: "User profile not found. Please log in again." }, { status: 401 });
+    }
+
+    const buyerUserId = dbUser._id.toString();
+    const buyerPhone = dbUser.phone;
 
     const { leadId } = await req.json();
     if (!leadId) {
       return NextResponse.json({ error: "Lead ID is required" }, { status: 400 });
     }
-
-    await connectDB();
 
     const lead = await Lead.findById(leadId);
     if (!lead) {
@@ -29,20 +44,22 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user already unlocked this lead
-    const alreadyUnlocked = lead.unlockedBy.some((id: any) => id.toString() === buyerUserId);
-    if (alreadyUnlocked) {
+    if (lead.unlockedBy.some((id: any) => id.toString() === buyerUserId)) {
       return NextResponse.json({
         success: true,
         message: "Lead already unlocked",
         tenantPhone: lead.tenantPhone,
-        tenantName: lead.tenantName
+        tenantName: lead.tenantName,
+        budget: lead.budget
       });
     }
 
-    // Check max buyers limit / exclusivity
-    if (lead.unlockedBy.length >= lead.maxBuyers) {
+    // Check max buyers limit (City signup and shared leads can be unlocked by up to 4 owners)
+    const isExclusive = lead.leadType === "exclusive" || lead.leadType === "verified";
+    const maxCapacity = isExclusive ? 1 : (lead.maxBuyers || 4);
+    if (lead.unlockedBy.length >= maxCapacity) {
       return NextResponse.json({
-        error: "This lead has reached its maximum buyer capacity and is sold out."
+        error: `This lead has reached its maximum capacity of ${maxCapacity} owner(s) and is sold out.`
       }, { status: 400 });
     }
 
@@ -55,7 +72,8 @@ export async function POST(req: NextRequest) {
     // Check wallet balance
     if (wallet.balance < lead.price) {
       return NextResponse.json({
-        error: `Insufficient wallet balance. Required: ₹${lead.price}, Current Balance: ₹${wallet.balance}. Please top up your wallet.`,
+        error: `Insufficient wallet balance. Required: ₹${lead.price}, Current Balance: ₹${wallet.balance}. Please deposit funds into your wallet.`,
+        insufficientFunds: true,
         requiredAmount: lead.price,
         currentBalance: wallet.balance
       }, { status: 400 });
@@ -98,6 +116,7 @@ export async function POST(req: NextRequest) {
       message: "Lead unlocked successfully!",
       tenantName: lead.tenantName,
       tenantPhone: lead.tenantPhone,
+      budget: lead.budget,
       newBalance: wallet.balance
     });
   } catch (error: any) {

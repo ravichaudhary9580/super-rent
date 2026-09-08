@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
@@ -22,7 +23,9 @@ import {
   PinOff,
   ChevronRight,
   AlertTriangle,
-  Palette
+  Palette,
+  UserCheck,
+  Contact
 } from "lucide-react";
 
 interface SidebarProps {
@@ -35,6 +38,21 @@ export function Sidebar({ role }: SidebarProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (showLogoutConfirm) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [showLogoutConfirm]);
   
   // Desktop Hover & Pin States
   const [isPinned, setIsPinned] = useState(true);
@@ -68,6 +86,7 @@ export function Sidebar({ role }: SidebarProps) {
           { name: "Dashboard", href: "/owner", icon: <LayoutDashboard className="w-5 h-5" /> },
           { name: "My Properties", href: "/owner/properties", icon: <Building className="w-5 h-5" /> },
           { name: "Leads Marketplace", href: "/owner/leads", icon: <DollarSign className="w-5 h-5" /> },
+          { name: "Purchased Leads", href: "/owner/purchased-leads", icon: <Contact className="w-5 h-5" /> },
           { name: "Profile", href: "/owner/profile", icon: <User className="w-5 h-5" /> },
         ];
       case "admin":
@@ -106,6 +125,7 @@ export function Sidebar({ role }: SidebarProps) {
           { name: "Home", href: "/owner", icon: <LayoutDashboard className="w-5 h-5" /> },
           { name: "Properties", href: "/owner/properties", icon: <Building className="w-5 h-5" /> },
           { name: "Leads", href: "/owner/leads", icon: <DollarSign className="w-5 h-5" /> },
+          { name: "Purchased", href: "/owner/purchased-leads", icon: <Contact className="w-5 h-5" /> },
         ];
       case "admin":
         return [
@@ -465,13 +485,32 @@ export function Sidebar({ role }: SidebarProps) {
       </aside>
 
       {/* 5. Logout Confirmation Modal Popup */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+      {mounted && showLogoutConfirm && typeof document !== "undefined" && createPortal(
+        <div 
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
+          style={{ 
+            position: "fixed", 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            width: "100vw", 
+            height: "100vh", 
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zoom: 1
+          }}
+        >
           <div 
             className="fixed inset-0"
             onClick={() => !isLoggingOut && setShowLogoutConfirm(false)}
           />
-          <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 text-center">
+          <div 
+            className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Warning Icon */}
             <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400 flex items-center justify-center shadow-inner">
               <LogOut className="w-7 h-7" />
@@ -510,7 +549,8 @@ export function Sidebar({ role }: SidebarProps) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

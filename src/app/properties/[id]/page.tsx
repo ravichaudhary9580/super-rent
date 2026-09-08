@@ -37,6 +37,11 @@ export default function PropertyDetails() {
           const data = await res.json();
           setProperty(data.property);
           setSelectedImgIdx(0);
+          fetch("/api/leads/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ propertyId: id, action: "view" })
+          }).catch(() => {});
         }
       } catch (e) {
         console.error(e);
@@ -415,7 +420,14 @@ export default function PropertyDetails() {
                 </div>
               ) : (
                 <button
-                  onClick={() => setContacted(true)}
+                  onClick={() => {
+                    setContacted(true);
+                    fetch("/api/leads/track", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ propertyId: id, action: "contact" })
+                    }).catch(() => {});
+                  }}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-2xl font-bold text-base shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
                   <PhoneCall className="h-5 w-5" />

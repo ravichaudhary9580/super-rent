@@ -39,7 +39,7 @@ export const authOptions: AuthOptions = {
               { phone: formattedPhone },
               { phone: credentials.phone },
               { email: "admin@providerapp.com" },
-              { email: "admin@superrent.com" }
+              { email: "admin@providerapp.com" }
             ]
           });
 
@@ -95,7 +95,7 @@ export const authOptions: AuthOptions = {
             user = await User.create({
               phone: formattedPhone,
               name: userName || "New User",
-              email: `${formattedPhone.replace(/\+/g, "")}@superrent.local`,
+              email: `${formattedPhone.replace(/\+/g, "")}@providerapp.local`,
               role: undefined
             });
           } catch (err: any) {
@@ -168,8 +168,13 @@ export const authOptions: AuthOptions = {
           token.name = dbUser.name;
           token.role = dbUser.role;
           token.phone = dbUser.phone;
-          token.picture = dbUser.image || "";
-          token.requiresOnboarding = Boolean(!dbUser.role || !dbUser.phone);
+          const isOwnerIncomplete = dbUser.role === "owner" && !dbUser.onboardingCompleted && (!dbUser.city || !dbUser.location);
+          const isTenantIncomplete = dbUser.role === "tenant" && !dbUser.onboardingCompleted && (!dbUser.city || !dbUser.location);
+          token.requiresOnboarding = Boolean(
+            !dbUser.role || 
+            !dbUser.phone || 
+            (dbUser.role !== "admin" && (isOwnerIncomplete || isTenantIncomplete))
+          );
         } else {
           token.requiresOnboarding = Boolean(!token.role || !token.phone);
         }
@@ -194,7 +199,7 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt"
   },
-  secret: process.env.NEXTAUTH_SECRET || "superrent_secret_fallback_key_production_32char"
+  secret: process.env.NEXTAUTH_SECRET || "providerapp_secret_fallback_key_production_32char"
 };
 
 const handler = NextAuth(authOptions);

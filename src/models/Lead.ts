@@ -6,13 +6,14 @@ export interface ILead extends Document {
   ownerId?: mongoose.Types.ObjectId;
   tenantName: string;
   tenantPhone?: string;
+  city?: string;
   college?: string;
   area?: string;
   budget?: number;
   gender?: "male" | "female" | "any";
   moveInTimeline?: string;
   leadType: "shared" | "exclusive" | "verified" | "pay_per_booking";
-  temperature: "hot" | "warm" | "cold";
+  category?: "signup" | "opened_property" | "tried_to_contact" | "conversion_system";
   price: number;
   maxBuyers: number;
   unlockedBy: mongoose.Types.ObjectId[];
@@ -30,8 +31,9 @@ const LeadSchema = new Schema<ILead>(
     ownerId: { type: Schema.Types.ObjectId, ref: "User" },
     tenantName: { type: String, required: true, default: "Prospective Tenant" },
     tenantPhone: { type: String },
-    college: { type: String, default: "Nearby College" },
-    area: { type: String, default: "North Campus" },
+    city: { type: String, default: "Greater Noida" },
+    college: { type: String, default: "" },
+    area: { type: String, default: "" },
     budget: { type: Number, default: 12000 },
     gender: { type: String, enum: ["male", "female", "any"], default: "any" },
     moveInTimeline: { type: String, default: "Within 15 days" },
@@ -41,7 +43,12 @@ const LeadSchema = new Schema<ILead>(
       default: "shared",
       required: true
     },
-    temperature: { type: String, enum: ["hot", "warm", "cold"], default: "hot", required: true },
+    category: {
+      type: String,
+      enum: ["signup", "opened_property", "tried_to_contact", "conversion_system"],
+      default: "signup",
+      required: true
+    },
     price: { type: Number, required: true, default: 49 },
     maxBuyers: { type: Number, default: 4 },
     unlockedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
@@ -53,7 +60,11 @@ const LeadSchema = new Schema<ILead>(
       default: "new"
     }
   },
-  { timestamps: true }
+  { timestamps: true, strict: false }
 );
+
+if (process.env.NODE_ENV !== "production") {
+  delete (mongoose.models as any).Lead;
+}
 
 export const Lead = mongoose.models.Lead || mongoose.model<ILead>("Lead", LeadSchema);

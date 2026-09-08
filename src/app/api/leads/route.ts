@@ -1,25 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/lib/mongoose";
+import { User } from "@/models/User";
 import { Lead } from "@/models/Lead";
 import { SystemSettings } from "@/models/SystemSettings";
 import { getMatchingLeads, getPriceForType } from "@/lib/distributionEngine";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession();
-    const buyerUserId = (session?.user as any)?.id;
+    const session = await getServerSession(authOptions);
+    let buyerUserId = (session?.user as any)?.id;
+
+    if (session?.user) {
+      await connectDB();
+      const sessionUser = session.user as any;
+      const dbUser = await User.findOne({
+        $or: [
+          { _id: sessionUser.id },
+          { phone: sessionUser.phone },
+          { email: sessionUser.email }
+        ].filter(Boolean)
+      });
+      if (dbUser) {
+        buyerUserId = dbUser._id.toString();
+      }
+    }
 
     const { searchParams } = new URL(req.url);
+    const category = searchParams.get("category") as any;
     const leadType = searchParams.get("leadType") as any;
+    const city = searchParams.get("city") || undefined;
     const area = searchParams.get("area") || undefined;
     const college = searchParams.get("college") || undefined;
+    const ownerId = searchParams.get("ownerId") || undefined;
     const maxBudget = searchParams.get("maxBudget") ? Number(searchParams.get("maxBudget")) : undefined;
 
     const leads = await getMatchingLeads({
+      category: category || undefined,
       leadType: leadType || undefined,
+      city,
       area,
       college,
+      ownerId: ownerId || buyerUserId,
       maxBudget,
       buyerUserId
     });
@@ -36,7 +59,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { tenantName, tenantPhone, college, area, budget, gender, moveInTimeline, leadType, temperature } = body;
+    const { tenantName, tenantPhone, college, area, budget, gender, moveInTimeline, leadType } = body;
 
     if (!tenantName || !tenantPhone) {
       return NextResponse.json({ error: "Tenant name and phone are required" }, { status: 400 });
@@ -60,7 +83,6 @@ export async function POST(req: NextRequest) {
       gender: gender || "any",
       moveInTimeline: moveInTimeline || "Within 15 days",
       leadType: type,
-      temperature: temperature || "hot",
       price,
       maxBuyers,
       unlockedBy: [],

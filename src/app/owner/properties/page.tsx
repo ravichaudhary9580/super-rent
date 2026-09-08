@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { 
   Building, 
   Plus, 
@@ -166,6 +167,21 @@ export default function MyProperties() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [formData, setFormData] = useState(INITIAL_FORM);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (showModal || !!deleteTarget) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [showModal, deleteTarget]);
 
   const fetchMyProperties = async () => {
     try {
@@ -1108,9 +1124,23 @@ export default function MyProperties() {
       )}
 
       {/* COMPREHENSIVE ADD / EDIT PROPERTY MODAL */}
-      {showModal && (
+      {mounted && showModal && typeof document !== "undefined" && createPortal(
         <div 
-          className="fixed inset-0 z-50 flex items-start justify-center p-2.5 sm:p-4 md:p-5 pt-3 sm:pt-4 md:pt-5 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 overflow-hidden"
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-2.5 sm:p-4 md:p-5 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 overflow-hidden"
+          style={{ 
+            position: "fixed", 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            width: "100vw", 
+            height: "100vh", 
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zoom: 1
+          }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowModal(false);
           }}
@@ -2229,13 +2259,37 @@ export default function MyProperties() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* DELETE CONFIRMATION MODAL */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 text-center space-y-4">
+      {mounted && deleteTarget && typeof document !== "undefined" && createPortal(
+        <div 
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
+          style={{ 
+            position: "fixed", 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            width: "100vw", 
+            height: "100vh", 
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zoom: 1
+          }}
+        >
+          <div 
+            className="fixed inset-0"
+            onClick={() => !isDeleting && setDeleteTarget(null)}
+          />
+          <div 
+            className="relative z-10 w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 text-center space-y-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto">
               <Trash2 className="w-7 h-7" />
             </div>
@@ -2263,7 +2317,8 @@ export default function MyProperties() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

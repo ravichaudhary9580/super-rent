@@ -209,13 +209,12 @@ html {
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
   }
 }
 
 .dashboard-page-enter {
-  animation: dashboard-page-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: opacity, transform;
+  animation: dashboard-page-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* 2. Staggered Card Entrance Animation */
@@ -333,35 +332,40 @@ html {
 
 
 body {
-  zoom: var(--dashboard-zoom, 0.9);
-  min-height: calc(100vh / var(--dashboard-zoom, 0.9));
+  min-height: 100vh;
   background-color: var(--color-bg-main);
   color: var(--color-text-main);
   transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
 }
 
-/* Adjust full viewport height classes to fill 100% of physical screen when scaled */
-.min-h-screen {
+/* Dashboard Zoom Scaling applied to container, NOT body */
+.dashboard-scaled {
+  zoom: var(--dashboard-zoom, 0.9);
+  min-height: calc(100vh / var(--dashboard-zoom, 0.9));
+}
+
+/* Adjust full viewport height classes to fill 100% of physical screen when scaled inside dashboard */
+.dashboard-scaled .min-h-screen {
   min-height: calc(100vh / var(--dashboard-zoom, 0.9)) !important;
 }
 
-.h-screen {
+.dashboard-scaled .h-screen {
   height: calc(100vh / var(--dashboard-zoom, 0.9)) !important;
 }
 
 /* Mobile Screens (Touch & Normal 100% Viewport Scaling) */
 @media (max-width: 768px) {
-  body {
+  .dashboard-scaled {
     zoom: 1 !important;
     min-height: 100vh !important;
   }
 
-  .min-h-screen {
+  .dashboard-scaled .min-h-screen {
     min-height: 100vh !important;
   }
 
-  .h-screen {
+  .dashboard-scaled .h-screen {
     height: 100vh !important;
   }
 }
