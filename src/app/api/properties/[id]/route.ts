@@ -15,7 +15,7 @@ export async function GET(
 
     let property = null;
     if (id && id.match(/^[0-9a-fA-F]{24}$/)) {
-      property = await Property.findById(id).populate("ownerId", "name phone email");
+      property = await Property.findById(id).populate("ownerId", "name phone email businessName hostelName image");
     }
 
     if (!property) {
@@ -66,13 +66,17 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid property ID" }, { status: 400 });
     }
 
-    const dbUser = await User.findOne({
-      $or: [
-        { _id: (session.user as any).id },
-        { phone: (session.user as any).phone },
-        { email: session.user.email }
-      ].filter(Boolean)
-    });
+    const sessionUser = session.user as any;
+    const userOrClauses: any[] = [];
+    if (sessionUser.id) userOrClauses.push({ _id: sessionUser.id });
+    if (sessionUser.phone) userOrClauses.push({ phone: sessionUser.phone });
+    if (session.user.email) userOrClauses.push({ email: session.user.email });
+
+    if (userOrClauses.length === 0) {
+      return NextResponse.json({ error: "Invalid session user" }, { status: 401 });
+    }
+
+    const dbUser = await User.findOne({ $or: userOrClauses });
 
     if (!dbUser) {
       return NextResponse.json({ error: "User not found" }, { status: 401 });
@@ -96,20 +100,23 @@ export async function PATCH(
     if (body.title !== undefined) property.title = body.title.trim();
     if (body.description !== undefined) property.description = body.description.trim();
     if (body.type !== undefined) property.type = body.type;
-    if (body.price !== undefined) property.price = Number(body.price);
+    if (body.price !== undefined && !isNaN(Number(body.price))) property.price = Number(body.price);
     if (body.pricingCycle !== undefined) property.pricingCycle = body.pricingCycle;
-    if (body.deposit !== undefined) property.deposit = Number(body.deposit);
-    if (body.maintenance !== undefined) property.maintenance = body.maintenance.trim();
-    if (body.noticePeriod !== undefined) property.noticePeriod = body.noticePeriod.trim();
+    if (body.deposit !== undefined && !isNaN(Number(body.deposit))) property.deposit = Number(body.deposit);
+    if (body.maintenance !== undefined) property.maintenance = String(body.maintenance).trim();
+    if (body.noticePeriod !== undefined) property.noticePeriod = String(body.noticePeriod).trim();
     if (body.genderPreference !== undefined) property.genderPreference = body.genderPreference;
     if (body.furnishing !== undefined) property.furnishing = body.furnishing;
-    if (body.occupancy !== undefined) property.occupancy = body.occupancy.trim();
+    if (body.occupancy !== undefined) property.occupancy = String(body.occupancy).trim();
+    if (body.contactPhone !== undefined) property.contactPhone = String(body.contactPhone).trim();
+
     if (Array.isArray(body.sharingOptions)) {
       property.sharingOptions = body.sharingOptions.filter((s: any) => typeof s === "string" && s.trim());
       if (!body.occupancy && property.sharingOptions.length > 0) {
         property.occupancy = property.sharingOptions.join(", ");
       }
     }
+
     if (Array.isArray(body.roomPricings)) {
       property.roomPricings = body.roomPricings
         .map((rp: any) => ({
@@ -119,8 +126,10 @@ export async function PATCH(
         }))
         .filter((rp: any) => rp.seater && (rp.acPrice !== null || rp.nonAcPrice !== null));
     }
+
     if (body.foodIncluded !== undefined) property.foodIncluded = body.foodIncluded;
-    if (body.availableFrom !== undefined) property.availableFrom = body.availableFrom.trim();
+    if (body.availableFrom !== undefined) property.availableFrom = String(body.availableFrom).trim();
+
     // Status control: Owner cannot choose listing status; only Admin can set status
     if (isAdmin && body.status !== undefined) {
       property.status = body.status;
@@ -142,14 +151,43 @@ export async function PATCH(
     }
 
     if (body.location) {
-      property.location = {
-        city: body.location.city !== undefined ? body.location.city.trim() : property.location.city,
-        area: body.location.area !== undefined ? body.location.area.trim() : property.location.area,
-        fullAddress: body.location.fullAddress !== undefined ? body.location.fullAddress.trim() : property.location.fullAddress,
-        pincode: body.location.pincode !== undefined ? body.location.pincode.trim() : property.location.pincode,
-        nearbyLandmark: body.location.nearbyLandmark !== undefined ? body.location.nearbyLandmark.trim() : property.location.nearbyLandmark,
-        coordinates: body.location.coordinates || property.location.coordinates
+      const updatedLocation: any = {
+        city: body.location.city !== undefined ? body.location.city.trim() : (property.location?.city || ""),
+        area: body.location.area !== undefined ? body.location.area.trim() : (property.location?.area || ""),
+        fullAddress: body.location.fullAddress !== undefined ? body.location.fullAddress.trim() : (property.location?.fullAddress || ""),
       };
+
+      if (body.location.pincode !== undefined) {
+        updatedLocation.pincode = body.location.pincode.trim();
+      } else if (property.location?.pincode) {
+        updatedLocation.pincode = property.location.pincode;
+      }
+
+      if (body.location.nearbyLandmark !== undefined) {
+        updatedLocation.nearbyLandmark = body.location.nearbyLandmark.trim();
+      } else if (property.location?.nearbyLandmark) {
+        updatedLocation.nearbyLandmark = property.location.nearbyLandmark;
+      }
+
+      if (
+        body.location.coordinates &&
+        body.location.coordinates.lat !== undefined &&
+        body.location.coordinates.lng !== undefined &&
+        !isNaN(Number(body.location.coordinates.lat)) &&
+        !isNaN(Number(body.location.coordinates.lng))
+      ) {
+        updatedLocation.coordinates = {
+          lat: Number(body.location.coordinates.lat),
+          lng: Number(body.location.coordinates.lng),
+        };
+      } else if (
+        property.location?.coordinates?.lat !== undefined &&
+        property.location?.coordinates?.lng !== undefined
+      ) {
+        updatedLocation.coordinates = property.location.coordinates;
+      }
+
+      property.location = updatedLocation;
     }
 
     await property.save();
@@ -181,13 +219,17 @@ export async function DELETE(
       return NextResponse.json({ error: "Invalid property ID" }, { status: 400 });
     }
 
-    const dbUser = await User.findOne({
-      $or: [
-        { _id: (session.user as any).id },
-        { phone: (session.user as any).phone },
-        { email: session.user.email }
-      ].filter(Boolean)
-    });
+    const sessionUser = session.user as any;
+    const userOrClauses: any[] = [];
+    if (sessionUser.id) userOrClauses.push({ _id: sessionUser.id });
+    if (sessionUser.phone) userOrClauses.push({ phone: sessionUser.phone });
+    if (session.user.email) userOrClauses.push({ email: session.user.email });
+
+    if (userOrClauses.length === 0) {
+      return NextResponse.json({ error: "Invalid session user" }, { status: 401 });
+    }
+
+    const dbUser = await User.findOne({ $or: userOrClauses });
 
     if (!dbUser) {
       return NextResponse.json({ error: "User not found" }, { status: 401 });

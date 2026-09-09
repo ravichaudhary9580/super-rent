@@ -24,13 +24,17 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
 
-      const dbUser = await User.findOne({
-        $or: [
-          { _id: (session.user as any).id },
-          { phone: (session.user as any).phone },
-          { email: session.user.email }
-        ].filter(Boolean)
-      });
+      const sessionUser = session.user as any;
+      const userOrClauses: any[] = [];
+      if (sessionUser.id) userOrClauses.push({ _id: sessionUser.id });
+      if (sessionUser.phone) userOrClauses.push({ phone: sessionUser.phone });
+      if (session.user.email) userOrClauses.push({ email: session.user.email });
+
+      if (userOrClauses.length === 0) {
+        return NextResponse.json({ error: "Invalid session user" }, { status: 401 });
+      }
+
+      const dbUser = await User.findOne({ $or: userOrClauses });
 
       if (!dbUser) {
         return NextResponse.json({ error: "User not found" }, { status: 401 });
@@ -82,13 +86,17 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    const dbUser = await User.findOne({
-      $or: [
-        { _id: (session.user as any).id },
-        { phone: (session.user as any).phone },
-        { email: session.user.email }
-      ].filter(Boolean)
-    });
+    const sessionUser = session.user as any;
+    const userOrClauses: any[] = [];
+    if (sessionUser.id) userOrClauses.push({ _id: sessionUser.id });
+    if (sessionUser.phone) userOrClauses.push({ phone: sessionUser.phone });
+    if (session.user.email) userOrClauses.push({ email: session.user.email });
+
+    if (userOrClauses.length === 0) {
+      return NextResponse.json({ error: "Invalid session user" }, { status: 401 });
+    }
+
+    const dbUser = await User.findOne({ $or: userOrClauses });
 
     if (!dbUser) {
       return NextResponse.json({ error: "Owner profile not found. Please re-login." }, { status: 401 });
@@ -162,7 +170,17 @@ export async function POST(req: NextRequest) {
         fullAddress: location.fullAddress?.trim() || `${location.area.trim()}, ${location.city.trim()}`,
         pincode: location.pincode?.trim() || "",
         nearbyLandmark: location.nearbyLandmark?.trim() || "",
-        coordinates: location.coordinates || undefined
+        ...(location.coordinates?.lat !== undefined &&
+        location.coordinates?.lng !== undefined &&
+        !isNaN(Number(location.coordinates.lat)) &&
+        !isNaN(Number(location.coordinates.lng))
+          ? {
+              coordinates: {
+                lat: Number(location.coordinates.lat),
+                lng: Number(location.coordinates.lng)
+              }
+            }
+          : {})
       },
       amenities: Array.isArray(amenities) ? amenities.filter((a: any) => typeof a === "string" && a.trim()) : [],
       images: Array.isArray(images) ? images.filter((img: any) => typeof img === "string" && img.trim()) : [],

@@ -407,7 +407,7 @@ export default function PurchasedLeadsPage() {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.text("SuperRent Provider App - Purchased Leads Directory", 30, 30);
+      doc.text("Provider App - Purchased Leads Directory", 30, 30);
 
       doc.setFontSize(9.5);
       doc.setFont("helvetica", "normal");
@@ -470,7 +470,7 @@ export default function PurchasedLeadsPage() {
           doc.setFontSize(8);
           doc.setTextColor(148, 163, 184);
           doc.text(str, doc.internal.pageSize.getWidth() - 50, doc.internal.pageSize.getHeight() - 15);
-          doc.text("Confidential - SuperRent Owner Purchased Directory", 30, doc.internal.pageSize.getHeight() - 15);
+          doc.text("Confidential - Owner Purchased Directory", 30, doc.internal.pageSize.getHeight() - 15);
         }
       });
 
@@ -667,7 +667,7 @@ export default function PurchasedLeadsPage() {
             ) : (
               <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             )}
-            <span>Export CSV</span>
+            <span>CSV</span>
           </button>
 
           <button
@@ -681,7 +681,7 @@ export default function PurchasedLeadsPage() {
             ) : (
               <FileText className="w-4 h-4 text-rose-500" />
             )}
-            <span>Export PDF</span>
+            <span>PDF</span>
           </button>
 
           {/* Cards vs Table View Toggle */}
@@ -1083,7 +1083,7 @@ export default function PurchasedLeadsPage() {
               <tbody className="divide-y divide-slate-100 text-xs text-slate-700 font-medium">
                 {filteredLeads.map((lead) => {
                   const cleanPhone = lead.tenantPhone ? lead.tenantPhone.replace(/[^0-9]/g, "").slice(-10) : "";
-                  const waUrl = cleanPhone ? `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(lead.tenantName || "")}%2C%20I%20saw%20your%20requirement%20for%20a%20property%20on%20SuperRent.` : "";
+                  const waUrl = cleanPhone ? `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(lead.tenantName || "")}%2C%20I%20saw%20your%20requirement%20for%20a%20property%20on%20ProviderApp.` : "";
 
                   return (
                     <tr key={lead._id} className="hover:bg-slate-50/80 transition-colors">
@@ -1228,7 +1228,7 @@ export default function PurchasedLeadsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredLeads.map((lead) => {
             const cleanPhone = lead.tenantPhone ? lead.tenantPhone.replace(/[^0-9]/g, "").slice(-10) : "";
-            const waUrl = cleanPhone ? `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(lead.tenantName || "")}%2C%20I%20saw%20your%20requirement%20for%20a%20property%20on%20SuperRent.` : "";
+            const waUrl = cleanPhone ? `https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(lead.tenantName || "")}%2C%20I%20saw%20your%20requirement%20for%20a%20property%20on%ProviderApp.` : "";
 
             return (
               <div

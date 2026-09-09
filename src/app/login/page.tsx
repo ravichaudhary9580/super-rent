@@ -23,6 +23,8 @@ function LoginForm() {
     }
   }, [searchParams]);
 
+  const roleParam = searchParams.get("role");
+
   const toggleMode = (newMode: "login" | "signup") => {
     setMode(newMode);
     setError("");
@@ -71,11 +73,35 @@ function LoginForm() {
         name: mode === "signup" ? name.trim() : undefined,
         phone,
         otp,
-        redirect: true,
-        callbackUrl: "/onboarding", // Middleware will route correctly if onboarded
+        redirect: false,
       });
       
       if (res?.error) throw new Error(res.error);
+
+      // Successfully signed in! Fetch fresh session to check onboarding status
+      const sessionRes = await fetch("/api/auth/session");
+      const sessionData = await sessionRes.json();
+      const user = sessionData?.user;
+
+      if (user) {
+        // If owner or tenant has already completed onboarding, go straight to their dashboard!
+        if (user.onboardingCompleted === true && user.role) {
+          window.location.href = user.role === "admin" ? "/admin" : `/${user.role}`;
+          return;
+        }
+
+        // If user already has a role and requiresOnboarding is false
+        if (user.requiresOnboarding === false && user.role) {
+          window.location.href = `/${user.role}`;
+          return;
+        }
+
+        // First time signup or incomplete onboarding: redirect to /onboarding
+        const targetUrl = roleParam ? `/onboarding?role=${roleParam}` : "/onboarding";
+        window.location.href = targetUrl;
+      } else {
+        window.location.href = "/onboarding";
+      }
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);
@@ -94,12 +120,19 @@ function LoginForm() {
             alt="Provider App"
             className="w-16 h-16 rounded-2xl mx-auto mb-4 object-contain shadow-xl shadow-purple-500/15"
           />
+          {mode === "signup" && roleParam === "owner" && (
+            <span className="inline-block bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-black px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-800 mb-2">
+              Property Owner Registration
+            </span>
+          )}
           <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
-            {mode === "signup" ? "Create Account" : "Welcome Back"}
+            {mode === "signup" ? (roleParam === "owner" ? "Create Owner Account" : "Create Account") : "Welcome Back"}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">
             {mode === "signup"
-              ? "Join Provider App to search properties and manage leads."
+              ? (roleParam === "owner"
+                ? "Sign up to list hostels, manage vacancies, and unlock tenant leads."
+                : "Join Provider App to search properties and manage leads.")
               : "Sign in to access your properties or dashboard."}
           </p>
         </div>

@@ -536,7 +536,10 @@ export default function MyProperties() {
       }
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save property listing");
+      if (!res.ok) {
+        const errMsg = data.details ? `${data.error}: ${data.details}` : (data.error || "Failed to save property listing");
+        throw new Error(errMsg);
+      }
 
       setShowModal(false);
       setFormData(INITIAL_FORM);

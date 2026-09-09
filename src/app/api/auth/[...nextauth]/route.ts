@@ -121,7 +121,8 @@ export const authOptions: AuthOptions = {
           name: user.name,
           email: user.email,
           phone: user.phone,
-          role: user.role
+          role: user.role,
+          onboardingCompleted: Boolean(user.onboardingCompleted)
         };
       }
     })
@@ -142,6 +143,9 @@ export const authOptions: AuthOptions = {
         if (session.requiresOnboarding !== undefined) {
           token.requiresOnboarding = session.requiresOnboarding;
         }
+        if (session.onboardingCompleted !== undefined) {
+          token.onboardingCompleted = session.onboardingCompleted;
+        }
         return token;
       }
 
@@ -151,6 +155,7 @@ export const authOptions: AuthOptions = {
         token.name = user.name;
         token.phone = (user as any).phone;
         token.role = (user as any).role;
+        token.onboardingCompleted = Boolean((user as any).onboardingCompleted);
         token.picture = (user as any).image || "";
       }
 
@@ -168,19 +173,34 @@ export const authOptions: AuthOptions = {
           token.name = dbUser.name;
           token.role = dbUser.role;
           token.phone = dbUser.phone;
-          const isOwnerIncomplete = dbUser.role === "owner" && !dbUser.onboardingCompleted && (!dbUser.city || !dbUser.location);
-          const isTenantIncomplete = dbUser.role === "tenant" && !dbUser.onboardingCompleted && (!dbUser.city || !dbUser.location);
-          token.requiresOnboarding = Boolean(
-            !dbUser.role || 
-            !dbUser.phone || 
-            (dbUser.role !== "admin" && (isOwnerIncomplete || isTenantIncomplete))
-          );
+
+          // Auto-mark onboarding completed if user already has an established profile
+          const hasOwnerProfile = dbUser.role === "owner" && (Boolean(dbUser.onboardingCompleted) || Boolean(dbUser.city && dbUser.location));
+          const hasTenantProfile = dbUser.role === "tenant" && (Boolean(dbUser.onboardingCompleted) || Boolean(dbUser.city && dbUser.location));
+
+          if (!dbUser.onboardingCompleted && (hasOwnerProfile || hasTenantProfile)) {
+            dbUser.onboardingCompleted = true;
+            await dbUser.save();
+          }
+
+          token.onboardingCompleted = Boolean(dbUser.onboardingCompleted);
+
+          // Requires onboarding ONLY if user has no role, no phone, or hasn't finished onboarding yet
+          if (dbUser.role === "admin") {
+            token.requiresOnboarding = false;
+          } else if (!dbUser.role || !dbUser.phone) {
+            token.requiresOnboarding = true;
+          } else {
+            token.requiresOnboarding = !dbUser.onboardingCompleted;
+          }
         } else {
           token.requiresOnboarding = Boolean(!token.role || !token.phone);
+          token.onboardingCompleted = false;
         }
       } catch (dbErr) {
         console.error("[NextAuth JWT DB sync error]:", dbErr);
         token.requiresOnboarding = Boolean(!token.role || !token.phone);
+        token.onboardingCompleted = false;
       }
 
       return token;
@@ -190,9 +210,12 @@ export const authOptions: AuthOptions = {
         (session.user as any).id = token.id as string;
         (session.user as any).phone = token.phone as string;
         (session.user as any).role = token.role as string;
-        (session.user as any).requiresOnboarding = token.requiresOnboarding as boolean;
+        (session.user as any).requiresOnboarding = Boolean(token.requiresOnboarding);
+        (session.user as any).onboardingCompleted = Boolean(token.onboardingCompleted);
         session.user.image = (token.picture as string) || "";
       }
+      (session as any).requiresOnboarding = Boolean(token.requiresOnboarding);
+      (session as any).onboardingCompleted = Boolean(token.onboardingCompleted);
       return session;
     }
   },

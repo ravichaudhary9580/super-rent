@@ -22,9 +22,9 @@ export default withAuth(
         return NextResponse.redirect(new URL(`/${token.role || "tenant"}`, req.url));
       }
 
-      // If user is fully onboarded but tries to go to /onboarding, redirect them to their dashboard
-      if (!token.requiresOnboarding && path === "/onboarding") {
-        return NextResponse.redirect(new URL(`/${token.role || "tenant"}`, req.url));
+      // If user is fully onboarded, never let them land on /onboarding
+      if ((!token.requiresOnboarding || (token as any).onboardingCompleted) && path === "/onboarding") {
+        return NextResponse.redirect(new URL(`/${token.role || "owner"}`, req.url));
       }
     }
     

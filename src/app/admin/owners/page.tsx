@@ -1398,10 +1398,21 @@ export default function AdminOwnersManagement() {
                                 <p className="text-xs font-extrabold text-emerald-600 mt-0.5">
                                   ₹{(property.price || 0).toLocaleString("en-IN")}/month
                                 </p>
-                                <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1 truncate">
-                                  <MapPin className="w-3 h-3 text-red-500 shrink-0" />
-                                  <span>{property.location?.area || property.location?.city || "New Delhi"}</span>
-                                </p>
+                                <div className="flex items-center justify-between gap-1 mt-1.5 pt-1.5 border-t border-slate-100">
+                                  <p className="text-[11px] text-slate-500 flex items-center gap-1 truncate">
+                                    <MapPin className="w-3 h-3 text-red-500 shrink-0" />
+                                    <span className="truncate">{property.location?.area || property.location?.city || "New Delhi"}</span>
+                                  </p>
+                                  <Link
+                                    href={`/properties/${property._id}`}
+                                    target="_blank"
+                                    className="px-2 py-0.5 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-lg text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors"
+                                    title="Open Live View"
+                                  >
+                                    <ExternalLink className="w-2.5 h-2.5" />
+                                    <span>Live View</span>
+                                  </Link>
+                                </div>
                               </div>
                             </div>
                           ))}

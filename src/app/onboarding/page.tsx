@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Building, 
   Building2,
@@ -14,16 +14,16 @@ import {
   GraduationCap, 
   IndianRupee, 
   ArrowRight, 
-  CheckCircle2,
-  ShieldCheck,
   Sparkles
 } from "lucide-react";
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryRole = searchParams.get("role") as "tenant" | "owner" | null;
   
-  const [role, setRole] = useState<"tenant" | "owner" | null>(null);
+  const [role, setRole] = useState<"tenant" | "owner" | null>(queryRole || null);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   
@@ -34,7 +34,7 @@ export default function OnboardingPage() {
   const [budget, setBudget] = useState("10000");
   const [gender, setGender] = useState<"any" | "male" | "female">("any");
 
-  // Owner Questionnaire Fields
+  // Owner Questionnaire Fields (First-time setup)
   const [ownerName, setOwnerName] = useState("");
   const [ownerCity, setOwnerCity] = useState("Greater Noida");
   const [ownerLocation, setOwnerLocation] = useState("");
@@ -50,27 +50,36 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
-    }
-    // If they explicitly don't require onboarding, redirect to their dashboard
-    if (status === "authenticated" && (session as any)?.requiresOnboarding === false) {
-      router.push(`/${(session.user as any)?.role || "tenant"}`);
+      return;
     }
 
-    // Prepopulate name and check if role was already set
     if (status === "authenticated" && session?.user) {
+      const user = session.user as any;
+      const isSessionOnboarded = (session as any)?.onboardingCompleted === true || (session as any)?.requiresOnboarding === false;
+      const isUserOnboarded = user?.onboardingCompleted === true || user?.requiresOnboarding === false;
+
+      // FIRST TIME ONLY: If owner or tenant already completed onboarding in DB/session, never ask again!
+      if (user.role && (isSessionOnboarded || isUserOnboarded)) {
+        router.replace(`/${user.role}`);
+        return;
+      }
+
+      // Prepopulate owner name from session if available
       if (session.user.name && !ownerName) {
         setOwnerName(session.user.name);
       }
-      const existingRole = (session.user as any)?.role;
-      if (existingRole === "owner" && step === "role") {
+
+      // If user came via /signup?role=owner or has role set
+      const targetRole = queryRole || user?.role;
+      if (targetRole === "owner" && step === "role") {
         setRole("owner");
-        setStep("owner_questionnaire");
-      } else if (existingRole === "tenant" && step === "role") {
+        setStep(hasPhone ? "owner_questionnaire" : "phone");
+      } else if (targetRole === "tenant" && step === "role") {
         setRole("tenant");
-        setStep("tenant_questionnaire");
+        setStep(hasPhone ? "tenant_questionnaire" : "phone");
       }
     }
-  }, [status, session, router, step, ownerName]);
+  }, [status, session, router, step, ownerName, queryRole, hasPhone]);
 
   if (!isReady || status === "unauthenticated") {
     return (
@@ -89,7 +98,7 @@ export default function OnboardingPage() {
         setStep("phone");
       }
     } else {
-      // Owner path - always collect details before landing
+      // Owner path - collect details for the first time
       if (hasPhone) {
         setStep("owner_questionnaire");
       } else {
@@ -191,7 +200,7 @@ export default function OnboardingPage() {
       city: string; 
       location: string; 
       hostelName: string; 
-      businessName: string; 
+      businessName: string;
     }
   ) => {
     setIsLoading(true);
@@ -217,10 +226,15 @@ export default function OnboardingPage() {
         throw new Error(data.error || "Failed to complete onboarding");
       }
       
-      // Update NextAuth session cookie so middleware unblocks them
-      await update();
+      // Update NextAuth session cookie so token.onboardingCompleted is true
+      await update({
+        name: ownerDetails?.name || undefined,
+        role: finalRole,
+        onboardingCompleted: true,
+        requiresOnboarding: false
+      });
       
-      // Redirect to the newly selected role dashboard
+      // Redirect to the newly onboarded owner dashboard
       window.location.href = `/${finalRole}`; 
       
     } catch (err: any) {
@@ -350,7 +364,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3: Owner Details Questionnaire (Before landing on /owner) */}
+        {/* Step 3: Owner Details Questionnaire (First Time Setup on Sign Up Only) */}
         {step === "owner_questionnaire" && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
             <div className="text-center pb-1">
@@ -358,13 +372,13 @@ export default function OnboardingPage() {
                 <Building2 className="w-7 h-7" />
               </div>
               <span className="inline-block bg-indigo-50 text-indigo-700 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full border border-indigo-200/60 mb-1.5">
-                Owner Setup • Step 2 of 2
+                Owner Setup • First-Time Profile
               </span>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
                 Tell us about your property & business
               </h1>
               <p className="text-slate-500 text-xs sm:text-sm mt-1">
-                Provide your hostel or PG details so prospective tenants and leads can locate you easily.
+                Provide your hostel or PG details once so prospective tenants and leads can locate you easily.
               </p>
             </div>
 
@@ -637,5 +651,17 @@ export default function OnboardingPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <OnboardingContent />
+    </Suspense>
   );
 }
